@@ -881,6 +881,8 @@ public class DecodeFrame extends JFrame {
 
         private final String saveFilePath;
 
+        private final List<String> allLogFilesPath = new ArrayList<>();
+
         public UnzipTask(String zipFilePath, String saveFilePath) {
             this.zipFilePath = zipFilePath;
             this.saveFilePath = saveFilePath;
@@ -888,27 +890,40 @@ public class DecodeFrame extends JFrame {
 
         @Override
         protected List<String> doInBackground() throws Exception {
+            allLogFilesPath.clear();
             if (zipFilePath.endsWith(".zip")) {
                 LogUtil.ei("开始解压文件：" + zipFilePath);
                 ZipFile zipFile = new ZipFile(zipFilePath);
                 zipFile.extractAll(saveFilePath);
                 File saveFileDir = new File(saveFilePath);
                 if (saveFileDir.isDirectory()) {
-                    List<File> logFiles = Arrays.asList(Objects.requireNonNull(saveFileDir.listFiles(pathname -> pathname.getAbsolutePath().endsWith("xlog"))));
-                    List<String> logPaths = new ArrayList<>();
-                    for (File file : logFiles) {
-                        LogUtil.ei("增加需要解密的日志文件：" + file.getName());
-                        logPaths.add(file.getAbsolutePath());
-                    }
-                    return logPaths;
+                    getAllFilePath(saveFileDir);
+                    return allLogFilesPath;
                 }
             } else {
                 LogUtil.ei("直接增加需要解密的日志文件：" + zipFilePath);
-                List<String> logFiles = new ArrayList<>();
-                logFiles.add(zipFilePath);
-                return logFiles;
+                allLogFilesPath.add(zipFilePath);
+                return allLogFilesPath;
             }
             return null;
+        }
+
+
+
+        private void getAllFilePath(File saveFileDir) {
+            File[] fileArray = saveFileDir.listFiles();
+            if (fileArray != null) {
+                for (File file : fileArray) {
+                    if (file.isDirectory()) {
+                        getAllFilePath(file);
+                    } else {
+                        if (file.getAbsolutePath().endsWith("xlog")) {
+                            LogUtil.ei("增加需要解密的日志文件：" + file.getName());
+                            allLogFilesPath.add(file.getAbsolutePath());
+                        }
+                    }
+                }
+            }
         }
 
         @Override

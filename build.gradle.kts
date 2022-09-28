@@ -1,5 +1,5 @@
-val releaseVersion = "1.1"
-val developmentVersion = "1.1"
+val releaseVersion = "1.2"
+val developmentVersion = "1.2"
 
 version = if( java.lang.Boolean.getBoolean( "release" ) ) releaseVersion else developmentVersion
 
