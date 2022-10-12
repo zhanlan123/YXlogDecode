@@ -85,7 +85,7 @@ launch4j {
 	windowTitle = 'YXLogDecode'
 	companyName = 'YXLogDecode'
 	jreMinVersion = '11'
-	jvmOptions = ['-Dawt.useSystemAAFontSettings=lcd', '-Dswing.aatext=true', '-XX:+UseG1GC', '-Djava.util.Arrays.useLegacyMergeSort=true']
+	jvmOptions = ['-Dawt.useSystemAAFontSettings=lcd', '-Dswing.aatext=true', '-XX:+UseG1GC', '-Djava.util.Arrays.useLegacyMergeSort=true', '-Dfile.encoding=utf-8']
 	jreRuntimeBits = "64"
 	bundledJre64Bit = true
 	initialHeapPercent = 5
