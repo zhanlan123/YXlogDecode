@@ -28,10 +28,9 @@ public class Utils {
 	/**
 	 * 判决是否存在文件
 	 * @Title: judeFileExists 
-	 * @Description: TODO(这里用一句话描述这个方法的作用) 
-	 * @param 参数说明
-	 * @return boolean    返回类型 
-	 * @throws
+	 * @Description: 判决是否存在文件
+	 * @param filePath 文件路径
+	 * @return boolean 是否存在
 	 */
 	public static boolean judeFileExists(String filePath) {
 		if (filePath != null && filePath.length() > 0) {

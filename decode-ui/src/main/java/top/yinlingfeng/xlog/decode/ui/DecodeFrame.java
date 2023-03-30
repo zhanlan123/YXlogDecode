@@ -175,7 +175,7 @@ public class DecodeFrame extends JFrame {
                 setSelectPrivateKeyModeIsFalse();
             }
         } catch (IOException | URISyntaxException e) {
-            LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
+            LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
             setSelectPrivateKeyModeIsFalse();
         }
 
@@ -230,7 +230,7 @@ public class DecodeFrame extends JFrame {
                 operationSave.setInputPrivateKeyInfo(inputPrivateKeyInfo);
             }
         } catch (IOException | URISyntaxException e) {
-            LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
+            LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
         }
 
     }
@@ -329,7 +329,7 @@ public class DecodeFrame extends JFrame {
         try {
             decodeInfoDocs.insertString(decodeInfoDocs.getLength(), text + "\n\n", fontAttribute.getAttrSet());
         } catch (BadLocationException e) {
-            LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
+            LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -389,7 +389,7 @@ public class DecodeFrame extends JFrame {
                     logDecodeSavePathTextField.setText("");
                     return true;
                 } catch (UnsupportedFlavorException | IOException e) {
-                    LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
+                    LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
                 }
                 return false;
             }
@@ -549,8 +549,6 @@ public class DecodeFrame extends JFrame {
      */
     private int privateKeyMode = 0;
 
-    private boolean isSelectPrivateMode = false;
-
     private final ItemListener itemListener = e -> {
         JCheckBox selectJCheckBox = (JCheckBox)(e.getSource());
         String actionCommand = selectJCheckBox.getActionCommand();
@@ -578,7 +576,6 @@ public class DecodeFrame extends JFrame {
 
     private void selectPrivateKeyOperation() {
         privateKeyMode = 1;
-        isSelectPrivateMode = true;
         inputPrivateKeyCheckBox.setSelected(false);
         inputPrivateKeyTextArea.setText("");
         inputPrivateKeyTextArea.setText(privateKeyInfo.getPrivateKeyValue());
@@ -588,7 +585,6 @@ public class DecodeFrame extends JFrame {
 
     private void inputPrivateKeyOperation() {
         privateKeyMode = 2;
-        isSelectPrivateMode = true;
         selectPrivateKeyCheckBox.setSelected(false);
         selectPrivateKeyInfoComboBox.setEnabled(false);
         btnDeletePrivateKeyInfoButton.setEnabled(false);
@@ -597,7 +593,6 @@ public class DecodeFrame extends JFrame {
     private void noSelectJude() {
         if (!inputPrivateKeyCheckBox.isSelected() && !selectPrivateKeyCheckBox.isSelected()) {
             privateKeyMode = 0;
-            isSelectPrivateMode = false;
         }
     }
 
@@ -639,7 +634,7 @@ public class DecodeFrame extends JFrame {
             ini.put(IniSelectionEnum.PRIVATE_KEY.getName(), name, privateKey);
             ini.store();
         } catch (IOException | URISyntaxException e) {
-            LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
+            LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -655,7 +650,7 @@ public class DecodeFrame extends JFrame {
             ini.put(IniSelectionEnum.PRIVATE_KEY.getName(), name, privateKey);
             ini.store();
         } catch (IOException | URISyntaxException e) {
-            LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
+            LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -674,7 +669,7 @@ public class DecodeFrame extends JFrame {
             ini.remove(IniSelectionEnum.PRIVATE_KEY.getName(), name);
             ini.store();
         } catch (IOException | URISyntaxException e) {
-            LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
+            LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -800,14 +795,17 @@ public class DecodeFrame extends JFrame {
             File saveLogFileTemp = new File(saveLogPath);
             if (saveLogFileTemp.exists()) {
                 if (!saveLogFileTemp.isDirectory()) {
-                    saveLogPath = logFile.getParentFile().getAbsolutePath() + File.separator + logFile.getName().split("\\.")[0];
+                    saveLogPath = logFile.getParentFile().getAbsolutePath() + File.separator + logFile.getName().substring(0, logFile.getName().lastIndexOf("."));
                     LogUtil.ei("选择保存的地址不是文件夹！");
                 }
             } else {
                 if (!saveLogFileTemp.mkdirs()) {
-                    saveLogPath = logFile.getParentFile().getAbsolutePath() + File.separator + logFile.getName().split("\\.")[0];
+                    saveLogPath = logFile.getParentFile().getAbsolutePath() + File.separator + logFile.getName().substring(0, logFile.getName().lastIndexOf("."));
                     LogUtil.ei("选择的保存的地址，不能创建！");
                 }
+            }
+            if (!saveLogFileTemp.getAbsolutePath().equals(saveLogPath)) {
+                LogUtil.ei("保存到默认地址：" + saveLogPath);
             }
             File saveLogFile = new File(saveLogPath);
             if (!saveLogFile.exists()) {
@@ -832,7 +830,7 @@ public class DecodeFrame extends JFrame {
             ini.put(IniSelectionEnum.OPERATION_SAVE.getName(), IniOptionNameEnum.INPUT_PRIVATE_KEY_INFO.getName(), inputPrivateKeyInfo);
             ini.store();
         } catch (IOException | URISyntaxException e) {
-            LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
+            LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -937,7 +935,7 @@ public class DecodeFrame extends JFrame {
                     decodeLogCompleteViewStatus();
                 }
             } catch (InterruptedException | ExecutionException e) {
-                LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
+                LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
                 decodeLogCompleteViewStatus();
             }
         }
@@ -1005,7 +1003,7 @@ public class DecodeFrame extends JFrame {
                     decodeSuccessCount++;
                 }
             } catch (InterruptedException | ExecutionException e) {
-                LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
+                LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
                 decodeFailureCount++;
             } finally {
                 updateTotalView();
