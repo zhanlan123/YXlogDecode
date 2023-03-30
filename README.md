@@ -8,6 +8,9 @@ XLog 的解码服务，可解码不加密、加密两种。可以在UI界面中�
 
 ![UI界面一](img/helpOne.jpg)
 ![UI界面二](img/helpTwo.jpg)
+
+**如果需要解密自己的加密日志，请删除测试的密钥TEST，或者选择输入密钥，填写自己的私钥，点击保存。**
+
 ![UI界面三](img/helpThree.jpg)
 
 ## Thanks
