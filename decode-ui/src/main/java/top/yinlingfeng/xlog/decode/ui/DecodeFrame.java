@@ -22,7 +22,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.*;
 import java.io.File;
@@ -244,12 +243,16 @@ public class DecodeFrame extends JFrame {
         }
         if (operationSave.getPrivateKeySelectMode() == 1) {
             selectPrivateKeyCheckBox.setSelected(true);
+            btnSavePrivateKeyInfoButton.setText("修改");
+            inputPrivateKeyTextArea.setEnabled(false);
             if (operationSave.getSelectPrivateKeySelectIndex() >= selectPrivateKeyInfoComboBox.getItemCount()) {
                 operationSave.setSelectPrivateKeySelectIndex(0);
             }
             selectPrivateKeyInfoComboBox.setSelectedIndex(operationSave.getSelectPrivateKeySelectIndex());
         } else {
             inputPrivateKeyCheckBox.setSelected(true);
+            btnSavePrivateKeyInfoButton.setText("保存");
+            inputPrivateKeyTextArea.setEnabled(true);
             if (!operationSave.getInputPrivateKeyInfo().isEmpty()) {
                 inputPrivateKeyTextArea.setText(operationSave.getInputPrivateKeyInfo());
             }
@@ -508,27 +511,40 @@ public class DecodeFrame extends JFrame {
         btnSavePrivateKeyInfoButton = new JButton("保存");
         btnSavePrivateKeyInfoButton.setFont(commonFont);
         btnSavePrivateKeyInfoButton.addActionListener(e -> {
-            if (privateKeyMode == 1) {
+            btnSavePrivateKeyInfoOperation();
+        });
+        contentPane.add(btnSavePrivateKeyInfoButton, "wrap, width 100:100:100");
+    }
+
+    /**
+     * 保存或者修改密钥操作
+     */
+    private void btnSavePrivateKeyInfoOperation() {
+        if (privateKeyMode == 1) {
+            if (btnSavePrivateKeyInfoButton.getText().equals("修改")) {
+                btnSavePrivateKeyInfoButton.setText("保存");
+                inputPrivateKeyTextArea.setEnabled(true);
+            } else {
                 String inputPrivateKeyInfo = inputPrivateKeyTextArea.getText().trim();
                 if (inputPrivateKeyInfo.length() > 0) {
                     addDecodePrivateKey(privateKeyInfo.getPrivateKeyName(), inputPrivateKeyInfo);
+                    btnSavePrivateKeyInfoButton.setText("修改");
+                    inputPrivateKeyTextArea.setEnabled(false);
                     LogUtil.ei("更新密钥成功！");
                 } else {
                     LogUtil.ei("密钥不能为空！");
                 }
-            } else if (privateKeyMode == 2){
-                String inputPrivateKeyInfo = inputPrivateKeyTextArea.getText().trim();
-                if (inputPrivateKeyInfo.length() > 0) {
-                    showSaveDialog("名称", "请输入密钥名称", inputPrivateKeyInfo);
-                } else {
-                    LogUtil.ei("密钥不能为空！");
-                }
-            } else {
-                LogUtil.ei("请选择密钥模式！");
             }
-
-        });
-        contentPane.add(btnSavePrivateKeyInfoButton, "wrap, width 100:100:100");
+        } else if (privateKeyMode == 2){
+            String inputPrivateKeyInfo = inputPrivateKeyTextArea.getText().trim();
+            if (inputPrivateKeyInfo.length() > 0) {
+                showSaveDialog("名称", "请输入密钥名称", inputPrivateKeyInfo);
+            } else {
+                LogUtil.ei("密钥不能为空！");
+            }
+        } else {
+            LogUtil.ei("请选择密钥模式！");
+        }
     }
 
     private final PrivateKeyInfo privateKeyInfo = new PrivateKeyInfo();
@@ -576,18 +592,22 @@ public class DecodeFrame extends JFrame {
 
     private void selectPrivateKeyOperation() {
         privateKeyMode = 1;
+        btnSavePrivateKeyInfoButton.setText("修改");
         inputPrivateKeyCheckBox.setSelected(false);
         inputPrivateKeyTextArea.setText("");
         inputPrivateKeyTextArea.setText(privateKeyInfo.getPrivateKeyValue());
+        inputPrivateKeyTextArea.setEnabled(false);
         selectPrivateKeyInfoComboBox.setEnabled(true);
         btnDeletePrivateKeyInfoButton.setEnabled(true);
     }
 
     private void inputPrivateKeyOperation() {
         privateKeyMode = 2;
+        btnSavePrivateKeyInfoButton.setText("保存");
         selectPrivateKeyCheckBox.setSelected(false);
         selectPrivateKeyInfoComboBox.setEnabled(false);
         btnDeletePrivateKeyInfoButton.setEnabled(false);
+        inputPrivateKeyTextArea.setEnabled(true);
     }
 
     private void noSelectJude() {
@@ -805,7 +825,7 @@ public class DecodeFrame extends JFrame {
                 }
             }
             if (!saveLogFileTemp.getAbsolutePath().equals(saveLogPath)) {
-                LogUtil.ei("保存到默认地址：" + saveLogPath);
+                LogUtil.ei("保存到地址：" + saveLogPath);
             }
             File saveLogFile = new File(saveLogPath);
             if (!saveLogFile.exists()) {
