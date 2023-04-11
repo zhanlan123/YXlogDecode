@@ -146,11 +146,11 @@ public class DecodeFrame extends JFrame {
     private final OperationSave operationSave = new OperationSave();
 
     private void initConfigSetting() {
-        initPrivateKey();
+        initPrivateKey(0);
         initOperationSave();
     }
 
-    private void initPrivateKey() {
+    private void initPrivateKey(int selectedIndex) {
         try {
             Wini ini = getWini();
             privateKeyInfoData.clear();
@@ -167,9 +167,12 @@ public class DecodeFrame extends JFrame {
                 selectPrivateKeyInfoComboBox.addItem(privateKeyInfo);
             }
             if (privateKeyInfoData.size() > 0) {
+                if (selectedIndex >= privateKeyInfoData.size()) {
+                    selectedIndex = 0;
+                }
                 //选择密钥选择框
                 selectPrivateKeyCheckBox.setEnabled(true);
-                selectPrivateKeyInfoComboBox.setSelectedIndex(0);
+                selectPrivateKeyInfoComboBox.setSelectedIndex(selectedIndex);
             } else {
                 setSelectPrivateKeyModeIsFalse();
             }
@@ -484,7 +487,7 @@ public class DecodeFrame extends JFrame {
         btnDeletePrivateKeyInfoButton.addActionListener(e -> {
             if (privateKeyMode == 1) {
                 deleteDecodePrivateKey(privateKeyInfo.getPrivateKeyName());
-                initPrivateKey();
+                initPrivateKey(0);
                 LogUtil.ei("删除密钥成功！");
             } else {
                 LogUtil.ei("请勾选选择密钥！");
@@ -634,9 +637,10 @@ public class DecodeFrame extends JFrame {
                     return;
                 }
             }
+            int saveIndex = privateKeyInfoData.size();
             updateDecodePrivateKey(result, inputPrivateKeyInfo);
             LogUtil.ei("保存密钥成功！");
-            initPrivateKey();
+            initPrivateKey(saveIndex);
         } else {
             LogUtil.ei("保存密钥失败！");
         }
@@ -1080,11 +1084,14 @@ public class DecodeFrame extends JFrame {
             selectPrivateKeyInfoComboBox.setEnabled(true);
             //删除密钥
             btnDeletePrivateKeyInfoButton.setEnabled(true);
+            //密钥输入框
+            inputPrivateKeyTextArea.setEnabled(false);
+        } else {
+            //密钥输入框
+            inputPrivateKeyTextArea.setEnabled(true);
         }
         //输入密钥选择框
         inputPrivateKeyCheckBox.setEnabled(true);
-        //密钥输入框
-        inputPrivateKeyTextArea.setEnabled(true);
         //保存密钥
         btnSavePrivateKeyInfoButton.setEnabled(true);
         //开始解密按钮
