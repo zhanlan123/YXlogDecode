@@ -1,7 +1,6 @@
 package top.yinlingfeng.xlog.decode.ui;
 
 import com.formdev.flatlaf.FlatLaf;
-
 import javax.swing.*;
 
 public class XLogDecodeUi {

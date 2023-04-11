@@ -2,8 +2,8 @@ package top.yinlingfeng.xlog.decode.ui.bean;
 
 public enum DecompressionType {
 
-    ZIP("zip流式解压"),
-    ZSTD("zstd流式解压");
+    ZIP("zip格式"),
+    ZSTD("zstd格式");
 
     private String decompressionName;
 

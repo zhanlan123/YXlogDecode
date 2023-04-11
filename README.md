@@ -2,11 +2,12 @@
 
 XLog 的解码服务，可解码不加密、加密两种。可以在UI界面中添加解密私钥。
 
-核心代码来自：https://github.com/wustMeiming/XlogDecoder
+核心代码来自：https://github.com/wustMeiming/XlogDecoder，更改了一些代码和增加了zstd支持
 
 已经提供exe包自带jre，可以直接运行。
 
-**兼容 mars-xlog的版本：1.0.5, 1.0.6, 1.0.7, 1.2.3, 1.2.4, 1.2.5, 1.2.6；不支持zstd压缩方式，只支持zip压缩方式**
+**支持zstd, zip压缩格式**
+**兼容 mars-xlog的版本：1.0.5, 1.0.6, 1.0.7, 1.2.3, 1.2.4, 1.2.5, 1.2.6**
 
 ![UI界面一](img/helpOne.jpg)
 ![UI界面二](img/helpTwo.jpg)

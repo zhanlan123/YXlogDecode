@@ -8,6 +8,8 @@ dependencies {
     implementation("org.bouncycastle:bcprov-jdk18on:1.71")
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation("org.apache.commons:commons-lang3:3.12.0")
+    // https://mvnrepository.com/artifact/com.github.luben/zstd-jni
+    implementation("com.github.luben:zstd-jni:1.5.4-2")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }

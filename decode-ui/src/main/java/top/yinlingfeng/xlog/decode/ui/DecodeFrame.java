@@ -698,7 +698,7 @@ public class DecodeFrame extends JFrame {
      */
     private void decodeLogDecompressionTypeSelectView() {
         //统计提示label
-        JLabel decodeHintDecompressionLabelTest = new JLabel("解压方式：");
+        JLabel decodeHintDecompressionLabelTest = new JLabel("支持的解压格式：");
         decodeHintDecompressionLabelTest.setFont(commonFont);
         contentPane.add(decodeHintDecompressionLabelTest);
 
@@ -706,7 +706,7 @@ public class DecodeFrame extends JFrame {
         selectDecompressionComboBox = new JComboBox<>();
         selectDecompressionComboBox.setFont(commonFont);
         selectDecompressionComboBox.setEditable(false);
-        selectDecompressionComboBox.setEnabled(false);
+        selectDecompressionComboBox.setEnabled(true);
         selectDecompressionComboBox.setMaximumRowCount(5);
         selectDecompressionComboBox.addItem(DecompressionType.ZIP);
         selectDecompressionComboBox.addItem(DecompressionType.ZSTD);

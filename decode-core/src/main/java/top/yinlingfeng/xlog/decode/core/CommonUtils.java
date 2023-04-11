@@ -1,6 +1,7 @@
 package top.yinlingfeng.xlog.decode.core;
 
-import java.io.ByteArrayOutputStream;
+import com.github.luben.zstd.*;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.zip.Inflater;
@@ -150,7 +151,26 @@ public class CommonUtils {
     }
 
     public static byte[] zstdDecompress(byte[] encodeData) {
-        byte[] writeByte = new byte[1];
-        return writeByte;
+        // 创建一个ByteArrayInputStream对象来读取压缩数据
+        ByteArrayInputStream bin = new ByteArrayInputStream(encodeData);
+        // 创建一个ByteArrayOutputStream对象以写入解压缩后的数据
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        // 创建一个ZstdInputStream对象进行流式解压缩
+        ZstdInputStream zin = null;
+        try {
+            zin = new ZstdInputStream(bin);
+            // 缓冲区大小，可以根据您的需求进行调整
+            byte[] buffer = new byte[1000000];
+            int bytesRead = zin.read(buffer, 0, 1000000);
+            // 将解压缩后的数据写入ByteArrayOutputStream对象
+            bout.write(buffer, 0, bytesRead);
+            // 关闭输入、输出流
+            zin.close();
+            bin.close();
+            bout.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return bout.toByteArray();
     }
 }
