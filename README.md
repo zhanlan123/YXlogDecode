@@ -4,10 +4,16 @@ XLog 的解码服务，可解码不加密、加密两种。可以在UI界面中�
 
 核心代码来自：https://github.com/wustMeiming/XlogDecoder，更改了一些代码和增加了zstd支持
 
-已经提供exe包自带jre，可以直接运行。
+左边点击release 可以下载已经提供exe包自带jre，可以直接运行。
+
+**当前存在的问题**
+- 1:文件只压缩无加密，输入空密钥无法解密；
+  解决办法：可以任意选择一个密钥（因为是根据文件内容判断是不是加密是读取文件判断的）
 
 **支持zstd, zip压缩格式**
 **兼容 mars-xlog的版本：1.0.5, 1.0.6, 1.0.7, 1.2.3, 1.2.4, 1.2.5, 1.2.6**
+
+**如果想集成到android中使用，直接使用decode-core，调用方式参考test，应该是可以的**
 
 ![UI界面一](img/helpOne.jpg)
 ![UI界面二](img/helpTwo.jpg)
