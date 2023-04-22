@@ -13,7 +13,7 @@ XLog 的解码服务，可解码不加密、加密两种。可以在UI界面中�
 **支持zstd, zip压缩格式**
 **兼容 mars-xlog的版本：1.0.5, 1.0.6, 1.0.7, 1.2.3, 1.2.4, 1.2.5, 1.2.6**
 
-**如果想集成到android中使用，需要更改解密库，暂时不支持**
+**如果想集成到android中使用，请看AndroidYXLogDecode里面的解密核心**
 
 ![UI界面一](img/helpOne.jpg)
 ![UI界面二](img/helpTwo.jpg)
