@@ -813,8 +813,7 @@ public class DecodeFrame extends JFrame {
                 return;
             }
             if (inputPrivateKeyInfo.length() == 0) {
-                LogUtil.ei("解密私钥密钥不能为空！");
-                return;
+                LogUtil.ei("解密私钥为空，将只解压缩！");
             }
             File saveLogFileTemp = new File(saveLogPath);
             if (saveLogFileTemp.exists()) {
@@ -989,7 +988,6 @@ public class DecodeFrame extends JFrame {
     }
 
     private void startDecodeLogFile(String logFilePath) {
-        LogUtil.ei("开始解密：" + logFilePath);
         String saveLogPath = logDecodeSavePathTextField.getText().trim();
         String inputPrivateKeyInfo = inputPrivateKeyTextArea.getText().trim();
         new DecodeLogTask(logFilePath, saveLogPath, inputPrivateKeyInfo).execute();
@@ -1012,9 +1010,10 @@ public class DecodeFrame extends JFrame {
         @Override
         protected String doInBackground() throws IOException {
             File logFile = new File(logFilePath);
-            LogUtil.ei("开始解密：" + logFile.getName());
+            LogUtil.ei("开始解密：" + logFile.getAbsolutePath());
             String outFile = saveLogPath + File.separator + logFile.getName() + ".log";
-            XLogFileDecode.ParseFile(logFilePath, outFile, privateKeyInfo);
+            LogUtil.ei("解密后文件：" + outFile);
+            XLogFileDecode.parseFile(logFilePath, outFile, privateKeyInfo);
             return logFile.getName();
         }
 

@@ -16,6 +16,7 @@ public class DecodeTest {
         test_zip_1_2_4();
         test_zip_1_2_5();
         test_zip_1_2_6();
+        test_zip_1_2_6_only_zip_compress();
         test_zstd_1_2_4();
     }
 
@@ -33,7 +34,7 @@ public class DecodeTest {
         }
         System.out.println("inFilePath:" + inFilePath);
         System.out.println("outFilePath:" + outFilePath);
-        XLogFileDecode.ParseFile(inFilePath, outFilePath, privateKey);
+        XLogFileDecode.parseFile(inFilePath, outFilePath, privateKey);
         Assertions.assertTrue(outFile.exists());
     }
 
@@ -51,7 +52,7 @@ public class DecodeTest {
         }
         System.out.println("inFilePath:" + inFilePath);
         System.out.println("outFilePath:" + outFilePath);
-        XLogFileDecode.ParseFile(inFilePath, outFilePath, privateKey);
+        XLogFileDecode.parseFile(inFilePath, outFilePath, privateKey);
         Assertions.assertTrue(outFile.exists());
     }
 
@@ -69,7 +70,7 @@ public class DecodeTest {
         }
         System.out.println("inFilePath:" + inFilePath);
         System.out.println("outFilePath:" + outFilePath);
-        XLogFileDecode.ParseFile(inFilePath, outFilePath, privateKey);
+        XLogFileDecode.parseFile(inFilePath, outFilePath, privateKey);
         Assertions.assertTrue(outFile.exists());
     }
 
@@ -87,7 +88,7 @@ public class DecodeTest {
         }
         System.out.println("inFilePath:" + inFilePath);
         System.out.println("outFilePath:" + outFilePath);
-        XLogFileDecode.ParseFile(inFilePath, outFilePath, privateKey);
+        XLogFileDecode.parseFile(inFilePath, outFilePath, privateKey);
         Assertions.assertTrue(outFile.exists());
     }
 
@@ -105,7 +106,7 @@ public class DecodeTest {
         }
         System.out.println("inFilePath:" + inFilePath);
         System.out.println("outFilePath:" + outFilePath);
-        XLogFileDecode.ParseFile(inFilePath, outFilePath, privateKey);
+        XLogFileDecode.parseFile(inFilePath, outFilePath, privateKey);
         Assertions.assertTrue(outFile.exists());
     }
 
@@ -123,7 +124,7 @@ public class DecodeTest {
         }
         System.out.println("inFilePath:" + inFilePath);
         System.out.println("outFilePath:" + outFilePath);
-        XLogFileDecode.ParseFile(inFilePath, outFilePath, privateKey);
+        XLogFileDecode.parseFile(inFilePath, outFilePath, privateKey);
         Assertions.assertTrue(outFile.exists());
     }
 
@@ -141,7 +142,25 @@ public class DecodeTest {
         }
         System.out.println("inFilePath:" + inFilePath);
         System.out.println("outFilePath:" + outFilePath);
-        XLogFileDecode.ParseFile(inFilePath, outFilePath, privateKey);
+        XLogFileDecode.parseFile(inFilePath, outFilePath, privateKey);
+        Assertions.assertTrue(outFile.exists());
+    }
+
+    @Test
+    public void test_zip_1_2_6_only_zip_compress() throws IOException, URISyntaxException {
+        String privateKey = "05cb6f67b111a49660d706b15875b1ffc840db68e3545bd2786f02ac9a1233ef";
+        File inFile = new File(getClass().getClassLoader().getResource("Release_1682159319133_20230422_1_2_6_only_zip_compress.xlog").toURI());
+        String inFilePath, outFilePath;
+        inFilePath = inFile.getAbsolutePath();
+        outFilePath = inFile.getAbsolutePath() + ".log";
+        File outFile = new File(outFilePath);
+        if (outFile.exists()) {
+            boolean deleteResult = outFile.delete();
+            System.out.println("deleteResult:" + deleteResult);
+        }
+        System.out.println("inFilePath:" + inFilePath);
+        System.out.println("outFilePath:" + outFilePath);
+        XLogFileDecode.parseFile(inFilePath, outFilePath, privateKey);
         Assertions.assertTrue(outFile.exists());
     }
 
@@ -159,7 +178,7 @@ public class DecodeTest {
         }
         System.out.println("inFilePath:" + inFilePath);
         System.out.println("outFilePath:" + outFilePath);
-        XLogFileDecode.ParseFile(inFilePath, outFilePath, privateKey);
+        XLogFileDecode.parseFile(inFilePath, outFilePath, privateKey);
         Assertions.assertTrue(outFile.exists());
     }
 

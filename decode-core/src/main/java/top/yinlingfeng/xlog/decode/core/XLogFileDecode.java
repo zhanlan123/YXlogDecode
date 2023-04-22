@@ -173,22 +173,23 @@ public class XLogFileDecode {
             if (MAGIC_NO_COMPRESS_START1 == _buffer[_offset] ||  MAGIC_SYNC_ZSTD_START==_buffer[_offset]){
                 LogUtil.i(TAG, "不是压缩开始位置一");
             } else if (MAGIC_COMPRESS_START2 == _buffer[_offset] || MAGIC_ASYNC_ZSTD_START==_buffer[_offset]) {
+                if (privateKey != null && privateKey.length() > 0) {
+                    byte[] byte_pubkey_x = new byte[32];
+                    byte[] byte_pubkey_y = new byte[32];
+                    ByteBuffer.wrap(_buffer, _offset+headerLen-crypt_key_len, crypt_key_len>>1).order(ByteOrder.LITTLE_ENDIAN).get(byte_pubkey_x);
+                    ByteBuffer.wrap(_buffer, _offset+headerLen-(crypt_key_len>>1), crypt_key_len>>1).order(ByteOrder.LITTLE_ENDIAN).get(byte_pubkey_y);
 
-                byte[] byte_pubkey_x = new byte[32];
-                byte[] byte_pubkey_y = new byte[32];
-                ByteBuffer.wrap(_buffer, _offset+headerLen-crypt_key_len, crypt_key_len>>1).order(ByteOrder.LITTLE_ENDIAN).get(byte_pubkey_x);
-                ByteBuffer.wrap(_buffer, _offset+headerLen-(crypt_key_len>>1), crypt_key_len>>1).order(ByteOrder.LITTLE_ENDIAN).get(byte_pubkey_y);
+                    String pubkey_x = CommonUtils.bytesToHexString(byte_pubkey_x);
+                    String pubkey_y = CommonUtils.bytesToHexString(byte_pubkey_y);
+                    String pubkey = String.format("04%s%s", pubkey_x, pubkey_y);
+                    LogUtil.i(TAG, "pubkey:" + pubkey);
 
-                String pubkey_x = CommonUtils.bytesToHexString(byte_pubkey_x);
-                String pubkey_y = CommonUtils.bytesToHexString(byte_pubkey_y);
-                String pubkey = String.format("04%s%s", pubkey_x, pubkey_y);
-                LogUtil.i(TAG, "pubkey:" + pubkey);
+                    byte[] tea_key = ECDHUtils.getECDHKey(CommonUtils.hexStringToByteArray(pubkey), CommonUtils.hexStringToBytes(privateKey));
 
-                byte[] tea_key = ECDHUtils.getECDHKey(CommonUtils.hexStringToByteArray(pubkey), CommonUtils.hexStringToBytes(privateKey));
+                    LogUtil.i(TAG, "teak_key:" + CommonUtils.bytesToHexString(tea_key));
 
-                LogUtil.i(TAG, "teak_key:" + CommonUtils.bytesToHexString(tea_key));
-
-                tmpbuffer = CommonUtils.tea_decrypt(tmpbuffer, tea_key);
+                    tmpbuffer = CommonUtils.tea_decrypt(tmpbuffer, tea_key);
+                }
                 if (MAGIC_COMPRESS_START2==_buffer[_offset]) {
                     tmpbuffer = CommonUtils.decompress(tmpbuffer);
                 } else {
@@ -217,15 +218,17 @@ public class XLogFileDecode {
         return retData;
     }
 
-    public static void ParseFile(String _file, String _outfile, String privateKey) throws IOException{
+    public static void parseFile(String _file, String _outfile, String privateKey) throws IOException{
         if (_file == null || _file.length() == 0) {
+            LogUtil.ei(TAG, "解密文件不能为空");
             return;
         }
         if (_outfile == null || _outfile.length() == 0) {
             _outfile = _file + ".log";
         }
         if (privateKey == null || privateKey.length() == 0) {
-            return;
+            LogUtil.ei(TAG, "解密私钥为空，只解压缩");
+            privateKey = "";
         }
 
         FileInputStream fis = null;
