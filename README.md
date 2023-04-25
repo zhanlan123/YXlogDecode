@@ -15,10 +15,8 @@
 - [概述](#概述)
 - [安装使用](#安装使用)
 - [构建运行](##构建运行)
-    - [Window,Linux,Mac构建运行](#Window,Linux,Mac构建运行)
-    - [Android构建运行](#Android构建运行)
-    - [Python Package Install](#python-package-install)
-    - [Other Build](#other-build)
+    - [Desktop](#Desktop)
+    - [Android](#Android)
 - [常见错误](##常见错误)
 - [感谢](##感谢)
 
@@ -71,7 +69,7 @@ bcprov-jdk18on-1.73.jar
 
 ## 构建运行
 
-### Window,Linux,Mac构建运行
+### Desktop
 
 - 1: 使用JetBrains Community Edition 打开，然后点击运行就可以。
 - 2: 使用JetBrains Community Edition 构建，如下图所示。
@@ -106,7 +104,7 @@ bcprov-jdk18on-1.73.jar
 .\gradlew :decode-ui:distWinWithJre
 ```
 
-### Android构建运行
+### Android
 
 **`Android`** 上只提供解密核心和一个简单的测试DEMO，如果需要集成到APP中。
 
