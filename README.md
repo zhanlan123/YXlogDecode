@@ -1,4 +1,4 @@
-<img src='./img/logo.png'  width="400"  style="max-width: 100%;" > 
+<p align="center"><img src='./img/logo.png'  width="128"  style="max-width: 100%;"/></p>
 
 # YXLogDecode
 
