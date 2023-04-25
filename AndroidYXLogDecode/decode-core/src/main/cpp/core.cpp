@@ -1,13 +1,11 @@
 #include <jni.h>
 #include <cstring>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
-#include <string.h>
-#include <android/log.h>
 #include "micro-ecc-master/uECC.h"
 
 bool Hex2Buffer(const char* str, size_t len, unsigned char* buffer);

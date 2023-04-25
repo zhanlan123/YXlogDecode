@@ -15,7 +15,6 @@ gradle-app.setting
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 
@@ -70,3 +69,6 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 
+/.fleet/run.json
+/AndroidCreateTestLogDemo/gradle/wrapper/gradle-wrapper.jar
+/AndroidYXLogDecode/gradle/wrapper/gradle-wrapper.jar

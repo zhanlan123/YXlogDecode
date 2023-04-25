@@ -1,29 +1,149 @@
+<img src='./img/logo.png'  width="400"  style="max-width: 100%;" > 
+
 # YXLogDecode
 
-XLog 的解码服务，可解码不加密、加密两种。可以在UI界面中添加解密私钥。
+![语言](https://img.shields.io/badge/language-C%7CC%2B%2B%7CJava-blue) ![Java](https://img.shields.io/badge/Java-%3E%3D1.8-green)
 
-核心代码来自：https://github.com/wustMeiming/XlogDecoder，更改了一些代码和增加了zstd支持
+**`YXLogDecode`** 是腾讯Mars-xlog的解密的Java实现版本，核心来自<a href="https://github.com/wustMeiming/XlogDecoder">XlogDecoder</a>。
+- 支持UI操作；
+- 支持压缩加密文件和只压缩文件的解密解压缩；
+- 压缩方式支持：ZIP，ZSTD；
+- 增加了一个可以在Android上运行的解密核心 **`AndroidYXLogDecode/decode-core`**；
 
-左边点击release 可以下载已经提供exe包自带jre，可以直接运行。
+### 目录
 
-**当前存在的问题**
-- 1:文件只压缩无加密，输入空密钥无法解密；
-  解决办法：可以任意选择一个密钥（因为是根据文件内容判断是不是加密的）
-  如果还是不能正确运行，请输入你自己的密钥，可能是你的这个文件就是加密的。
+- [概述](##概述)
+- [安装使用](##安装使用)
+- [构建运行](##构建运行)
+    - [Window,Linux,Mac](###Window,Linux,Mac 构建运行)
+    - [Android](###Android 构建运行)
+- [常见错误](##常见错误)
+- [感谢](##感谢)
 
-**支持zstd, zip压缩格式**
-**兼容 mars-xlog的版本：1.0.5, 1.0.6, 1.0.7, 1.2.3, 1.2.4, 1.2.5, 1.2.6**
+## 概述
 
-**如果想集成到android中使用，请看AndroidYXLogDecode里面的解密核心**
+**`YXLogDecode`** 简单使用说明
 
-![UI界面一](img/helpOne.jpg)
-![UI界面二](img/helpTwo.jpg)
+![使用说明](img/help_readme.png)
 
-**如果需要解密自己的加密日志，请删除测试的密钥TEST，或者选择输入密钥，填写自己的私钥，点击保存。**
+## 安装使用
 
-![UI界面三](img/helpThree.jpg)
+**`YXLogDecode`** 需要JDK（版本需要1.8版本以上的OpenJdk）
 
-## Thanks
+**`Windows`** 系统可以直接下载[Release](https://github.com/zhanlan123/YXlogDecode/releases)下的已经打成zip压缩包的文件，里面自带JRE。
+
+**`MAC,Linux`** 直接下载[Release](https://github.com/zhanlan123/YXlogDecode/releases)下的jar文件，然后自行下载OpenJdk。
+
+如果使用 **`OracleJdk`** 那么请按照下面方式修改：
+
+- 1: 修改 JAVA_HOME\jre\lib\security\java.security 文件, 添加如下内容:
+
+```ini
+security.provider.11=org.bouncycastle.jce.provider.BouncyCastleProvider
+```
+**其中security.provider.11中的11是根据已有的配置行顺序而定的，如下**
+
+```ini
+security.provider.1=sun.security.provider.Sun
+security.provider.2=sun.security.rsa.SunRsaSign
+security.provider.3=sun.security.ec.SunEC
+security.provider.4=com.sun.net.ssl.internal.ssl.Provider
+security.provider.5=com.sun.crypto.provider.SunJCE
+security.provider.6=sun.security.jgss.SunProvider
+security.provider.7=com.sun.security.sasl.Provider
+security.provider.8=org.jcp.xml.dsig.internal.dom.XMLDSigRI
+security.provider.9=sun.security.smartcardio.SunPCSC
+security.provider.10=sun.security.mscapi.SunMSCAPI
+security.provider.11=org.bouncycastle.jce.provider.BouncyCastleProvider
+```
+
+- 2: 在JAVA_HOME\jre\lib\ext 文件夹中加入源码目录jar下的
+ 
+```text
+bcprov-jdk18on-1.73.jar
+```
+[下载bcprov-jdk18on-1.73.jar](./jar/bcprov-jdk18on-1.73.jar)
+
+**如果有其他的`BC` jar请删除**
+
+
+## 构建运行
+
+### Window,Linux,Mac 构建运行
+
+- 1: 使用JetBrains Community Edition 打开，然后点击运行就可以。
+- 2: 使用JetBrains Community Edition 构建，如下图所示。
+
+![构建演示](./img/help_build.png)
+
+- 3：使用Gradle进行构建：
+
+**`window`**
+
+```cmd
+# 打包成可运行的exe文件
+.\gradlew.bat :decode-ui:createExe 
+
+# 打包成可运行的jar文件
+.\gradlew.bat :decode-ui:shadowJar
+
+# 打包带JRE和exe的zip文件
+.\gradlew.bat :decode-ui:distWinWithJre
+```
+
+**`Linux,MAC`**
+
+```bash
+# 打包成可运行的exe文件
+.\gradlew :decode-ui:createExe 
+
+# 打包成可运行的jar文件
+.\gradlew :decode-ui:shadowJar
+
+# 打包带JRE和exe的zip文件
+.\gradlew :decode-ui:distWinWithJre
+```
+
+### Android 构建运行
+
+**`Android`** 上只提供解密核心和一个简单的测试DEMO，如果需要集成到APP中。
+
+- 1: 手动集成源码: **`AndroidYXLogDecode/decode-core`**
+
+
+- 2: 下载源码目录中的：**`decode-core-1.0.aar`**
+
+**然后在build.gradle中增加如下依赖：**
+```groovy
+// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+implementation("org.apache.commons:commons-lang3:3.12.0")
+// https://mvnrepository.com/artifact/com.github.luben/zstd-jni
+implementation("com.github.luben:zstd-jni:1.5.4-2@aar")
+```
+
+
+
+## 常见错误
+
+- 1: 使用了OracleJdk，但是没有按照说明修改。
+
+```bash
+java.security.NoSuchProviderException: JCE cannot authenticate the provider BC
+```
+
+- 2：密钥错误
+
+```bash
+java.util.concurrent.ExecutionException: java.lang.NullPointerException: Cannot read the array length because "<parameter1>" is null
+```
+
+**如果出现此错误，请使用测试公钥替换你自己的公钥试一试；**
+
+- 测试公钥：
+
+**`94e62d97637f357fbd20f0c1f667a67c2f675e158e46015dd0cc54cb3995d0a5d468f7e98b20aec266effb61ec0a2321fb1f8c61af72bf76567921a0d8305005`**
+
+## 感谢
 
 <ul>
     <li><a href="https://github.com/wustMeiming/XlogDecoder">XlogDecoder</a></li>
@@ -38,4 +158,8 @@ XLog 的解码服务，可解码不加密、加密两种。可以在UI界面中�
     <li><a href="http://launch4j.sourceforge.net/">Launch4j</a></li>
 </ul>
 
-### LICENSE
+
+
+
+
+

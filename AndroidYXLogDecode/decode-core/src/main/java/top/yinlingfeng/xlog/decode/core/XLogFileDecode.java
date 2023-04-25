@@ -222,7 +222,7 @@ public class XLogFileDecode {
             _outfile = _file + ".log";
         }
         if (privateKey == null || privateKey.length() == 0) {
-            LogUtil.ei(TAG, "解密私钥为空，只解压缩！")
+            LogUtil.ei(TAG, "解密私钥为空，只解压缩！");
         }
 
         FileInputStream fis = null;

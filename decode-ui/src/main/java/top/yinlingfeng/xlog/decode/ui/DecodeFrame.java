@@ -94,7 +94,7 @@ public class DecodeFrame extends JFrame {
     //实际使用的配置文件
     private static final String TEMP_INI_FILE = "./config.ini";
 
-    private static final String DEFAULT_LOGO = "/top/yinlingfeng/xlog/decode/ui/FlatLaf.svg";
+    private static final String DEFAULT_LOGO = "/top/yinlingfeng/xlog/decode/ui/logo.svg";
 
     public DecodeFrame() {
 
@@ -114,7 +114,7 @@ public class DecodeFrame extends JFrame {
         setContentPaneView();
         addSelectLogPathView();
         addLogPrivateKeyView();
-        decodeLogDecompressionTypeSelectView();
+        //decodeLogDecompressionTypeSelectView();
         decodeLogStatisticsView();
         decodeOperationInfoView();
     }
@@ -357,7 +357,7 @@ public class DecodeFrame extends JFrame {
                 "[pref!]" +
                         "[grow,fill]" +
                         "[pref!]",
-                "[][][][][][][][]");
+                "[][][][][][][]");
         contentPane.setLayout(layout);
     }
 
@@ -702,7 +702,7 @@ public class DecodeFrame extends JFrame {
      */
     private void decodeLogDecompressionTypeSelectView() {
         //统计提示label
-        JLabel decodeHintDecompressionLabelTest = new JLabel("支持的解压格式：");
+        JLabel decodeHintDecompressionLabelTest = new JLabel("解压格式：");
         decodeHintDecompressionLabelTest.setFont(commonFont);
         contentPane.add(decodeHintDecompressionLabelTest);
 
