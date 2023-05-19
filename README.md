@@ -8,7 +8,7 @@
 - 支持UI操作；
 - 支持压缩加密文件和只压缩文件的解密解压缩；
 - 压缩方式支持：ZIP，ZSTD；
-- 增加了一个可以在Android上运行的解密核心 **`AndroidYXLogDecode/decode-core`**；
+- 增加了一个可以在Android上运行的解密核心 **`android/decode-core`**；
 
 ### 目录
 
@@ -108,10 +108,10 @@ bcprov-jdk18on-1.73.jar
 
 **`Android`** 上只提供解密核心和一个简单的测试DEMO，如果需要集成到APP中。
 
-- 1: 手动集成源码: **`AndroidYXLogDecode/decode-core`**
+- 1: 手动集成源码: **`android/decode-core`**
 
 
-- 2: 下载源码目录中的：**`decode-core-1.0.aar`**
+- 2: 下载源码目录中的：**`jar/decode-core-1.0.aar`**
 
 **然后在build.gradle中增加如下依赖：**
 ```groovy

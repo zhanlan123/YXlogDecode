@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">YXLogDecodeTest</string>
+    <string name="test_zip">解密使用zip压缩的文件</string>
+    <string name="test_zstd">解密使用zstd压缩的文件</string>
+</resources>

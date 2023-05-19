@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">CreateTestLog</string>
-    <string name="init_xlog">初始化日志</string>
-    <string name="close_xlog">关闭日志</string>
-    <string name="print_xlog">打印日志</string>
-</resources>

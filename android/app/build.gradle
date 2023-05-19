@@ -1,0 +1,50 @@
+plugins {
+    id 'com.android.application'
+    //如果需要使用kotlin
+    //id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'top.yinlingfeng.xlog.decode'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "top.yinlingfeng.xlog.decode"
+        minSdk 24
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+        ndk {
+            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a'
+        }
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation project(":android:decode-core")
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation(platform("io.github.Rosemoe.sora-editor:bom:0.21.1"))
+    implementation("io.github.Rosemoe.sora-editor:editor")
+    implementation 'io.github.molihuan:pathselector:1.1.14'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
