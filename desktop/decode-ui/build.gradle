@@ -8,7 +8,7 @@ plugins {
 }
 
 ext {
-	YXLogDecodeVersion = "1.6"
+	YXLogDecodeVersion = "1.7"
 }
 
 
@@ -25,7 +25,7 @@ dependencies {
 	implementation 'org.ini4j:ini4j:0.5.4'
 	// https://mvnrepository.com/artifact/commons-io/commons-io
 	implementation 'commons-io:commons-io:2.11.0'
-	implementation 'net.lingala.zip4j:zip4j:2.11.1'
+	implementation 'net.lingala.zip4j:zip4j:2.11.5'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.1'
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
 }

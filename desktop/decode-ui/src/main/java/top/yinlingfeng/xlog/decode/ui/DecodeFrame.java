@@ -3,6 +3,7 @@ package top.yinlingfeng.xlog.decode.ui;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.extras.FlatSVGUtils;
 import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -910,12 +911,17 @@ public class DecodeFrame extends JFrame {
         }
 
         @Override
-        protected List<String> doInBackground() throws Exception {
+        protected List<String> doInBackground() {
             allLogFilesPath.clear();
             if (zipFilePath.endsWith(".zip")) {
                 LogUtil.ei("开始解压文件：" + zipFilePath);
-                ZipFile zipFile = new ZipFile(zipFilePath);
-                zipFile.extractAll(saveFilePath);
+                // 防止因为解压出错，但是实际解压成功，导致不能解密。
+                try {
+                    ZipFile zipFile = new ZipFile(zipFilePath);
+                    zipFile.extractAll(saveFilePath);
+                } catch (ZipException e) {
+                    LogUtil.ei("异常信息：压缩文件存在异常！");
+                }
                 File saveFileDir = new File(saveFilePath);
                 if (saveFileDir.isDirectory()) {
                     getAllFilePath(saveFileDir);

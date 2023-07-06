@@ -17,7 +17,6 @@ pluginManagement {
         id("edu.sc.seis.launch4j").version("2.5.3")
         id("com.github.johnrengelman.shadow").version("7.1.2")
         id("org.beryx.runtime").version("1.12.7")
-        id("com.android.application") version "7.3.0"
     }
 }
 
