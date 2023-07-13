@@ -1,17 +1,20 @@
 plugins {
 	id 'application'
 	//如果需要使用kotlin
-	//id 'org.jetbrains.kotlin.jvm'
+	id 'org.jetbrains.kotlin.jvm'
 	id 'edu.sc.seis.launch4j'
 	id 'com.github.johnrengelman.shadow'
 	id 'org.beryx.runtime'
+	id 'com.github.gmazzo.buildconfig'
 }
 
 ext {
 	YXLogDecodeVersion = "1.7"
 }
 
-
+buildConfig {
+	buildConfigField('String', 'YXLogDecodeVersion', "\"${YXLogDecodeVersion}\"")
+}
 
 dependencies {
 	implementation(project(':desktop:decode-core'))

@@ -2,7 +2,7 @@
 
 # YXLogDecode
 
-![语言](https://img.shields.io/badge/language-C%7CC%2B%2B%7CJava-blue) ![Java](https://img.shields.io/badge/Java-%3E%3D1.8-green) ![Relase](https://img.shields.io/badge/Relase-1.6-yellow)
+![语言](https://img.shields.io/badge/language-C%7CC%2B%2B%7CJava-blue) ![Java](https://img.shields.io/badge/Java-%3E%3D1.8-green) ![Relase](https://img.shields.io/badge/Relase-1.7-yellow)
 
 **`YXLogDecode`** 是腾讯Mars-xlog的解密的Java实现版本，核心来自<a href="https://github.com/wustMeiming/XlogDecoder">XlogDecoder</a>。
 - 支持UI操作；

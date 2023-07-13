@@ -1,5 +1,6 @@
 package top.yinlingfeng.xlog.decode.ui;
 
+import YXLogDecode.desktop.decode_ui.BuildConfig;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.extras.FlatSVGUtils;
 import net.lingala.zip4j.ZipFile;
@@ -349,7 +350,7 @@ public class DecodeFrame extends JFrame {
                 (height - 550) / 2, 480, 550);
         setResizable(true);
         setFont(commonFont);
-        setTitle("XLog解密");
+        setTitle("XLog解密" + BuildConfig.YXLogDecodeVersion);
         addWindowListener(windowListener);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

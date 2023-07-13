@@ -10,13 +10,14 @@ pluginManagement {
 
     plugins {
         //如果需要使用kotlin
-        //kotlin("jvm").version(extra["kotlin.version"] as String)
+        kotlin("jvm").version(extra["kotlin.version"] as String)
         //kotlin("android").version(extra["kotlin.version"] as String)
         id("com.android.application").version(extra["agp.version"] as String)
         id("com.android.library").version(extra["agp.version"] as String)
         id("edu.sc.seis.launch4j").version("2.5.3")
         id("com.github.johnrengelman.shadow").version("7.1.2")
         id("org.beryx.runtime").version("1.12.7")
+        id("com.github.gmazzo.buildconfig").version("3.1.0")
     }
 }
 
