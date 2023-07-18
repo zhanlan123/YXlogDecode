@@ -8,8 +8,8 @@ allprojects {
 project(":desktop:decode-core") {
     tasks {
         withType<JavaCompile>().configureEach {
-            sourceCompatibility = "1.8"
-            targetCompatibility = "1.8"
+            sourceCompatibility = "17"
+            targetCompatibility = "17"
 
             options.encoding = "UTF-8"
             options.isDeprecation = false
@@ -43,8 +43,8 @@ project(":desktop:decode-core") {
 project(":desktop:decode-ui") {
     tasks {
         withType<JavaCompile>().configureEach {
-            sourceCompatibility = "1.8"
-            targetCompatibility = "1.8"
+            sourceCompatibility = "17"
+            targetCompatibility = "17"
 
             options.encoding = "UTF-8"
             options.isDeprecation = false
@@ -77,7 +77,7 @@ project(":desktop:decode-ui") {
 
 plugins {
     //如果需要使用kotlin
-    //kotlin("android") apply false
+    kotlin("android") apply false
     id("com.android.application") apply false
     id("com.android.library") apply false
 }
