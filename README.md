@@ -69,12 +69,12 @@ bcprov-jdk18on-1.73.jar
 
 ## 构建运行
 
-`Gradle运行的需要配置JDK是OpenJdk 11以上，项目依赖也需要配置OpenJdk以上，不能是Oracle Jdk`
+`Gradle运行的需要配置JDK是OpenJdk 17以上，项目依赖也需要配置OpenJdk以上，不能是Oracle Jdk`
 
 ### Desktop
 
-- 1: 使用JetBrains Community Edition 打开，然后点击运行就可以。
-- 2: 使用JetBrains Community Edition 构建，如下图所示。
+- 1: 使用Android Studio 打开，然后点击运行就可以。
+- 2: 使用Android Studio 构建，如下图所示。
 
 ![构建演示](./img/help_build.png)
 
