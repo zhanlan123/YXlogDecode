@@ -9,7 +9,7 @@
 - 支持压缩加密文件和只压缩文件的解密解压缩；
 - 压缩方式支持：ZIP，ZSTD；
 - 增加了一个可以在Android上运行的解密核心 **`android/decode-core`**；
-- 增加了一个Android上解密查看日志的APP；
+- 增加了一个Android上解密查看日志的APP: <a href="https://github.com/zhanlan123/YXlogDecode/releases/download/1.7/XLog.apk">XLog.apk</a>；
 
 ### 目录
 
