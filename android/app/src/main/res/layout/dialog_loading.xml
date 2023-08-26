@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <com.google.android.material.circularreveal.cardview.CircularRevealCardView
+        android:layout_width="@dimen/dp_150"
+        android:layout_height="wrap_content"
+        android:minWidth="@dimen/dp_150"
+        android:minHeight="@dimen/dp_150"
+        android:maxWidth="@dimen/dp_250"
+        android:maxHeight="@dimen/dp_250"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:cardPreventCornerOverlap="true"
+        app:cardCornerRadius="@dimen/dp_10"
+        app:cardElevation="@dimen/dp_0"
+        app:cardBackgroundColor="#F0212121"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/dp_10"
+            >
+
+            <androidx.core.widget.ContentLoadingProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="@dimen/dp_25"
+                android:layout_height="@dimen/dp_25"
+                android:layout_gravity="center_horizontal"
+                android:indeterminateBehavior="repeat"
+                android:indeterminateDrawable="@drawable/dialog_loading"
+                android:indeterminateOnly="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="@dimen/dp_30"
+                />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/sp_16"
+                android:textColor="@color/white"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:text="@string/loading_message"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/progress_bar"
+                android:layout_marginTop="@dimen/dp_20"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

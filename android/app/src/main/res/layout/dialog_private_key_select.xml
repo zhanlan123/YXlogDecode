@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_main"
+        android:layout_width="@dimen/dp_330"
+        android:layout_height="@dimen/dp_300"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingTop="@dimen/dp_5"
+        android:paddingBottom="@dimen/dp_20"
+        >
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="@dimen/dp_60"
+            android:layout_height="@dimen/dp_35"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:gravity="center"
+            android:text="@string/tv_cancel"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="@dimen/sp_18"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/tv_cancel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/no_have_private_key"
+            android:textSize="@dimen/sp_18"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:visibility="gone"
+            tools:visibility="visible"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_private_key"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_0"
+            app:layout_constraintTop_toBottomOf="@id/tv_cancel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:listitem="@layout/select_private_key_item"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

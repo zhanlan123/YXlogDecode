@@ -9,6 +9,7 @@
 - 支持压缩加密文件和只压缩文件的解密解压缩；
 - 压缩方式支持：ZIP，ZSTD；
 - 增加了一个可以在Android上运行的解密核心 **`android/decode-core`**；
+- 增加了一个Android上解密查看日志的APP；
 
 ### 目录
 
@@ -26,7 +27,9 @@
 
 ![使用说明](img/help_readme.png)
 
-## 安装使用
+![Android界面](img/help_android.png)
+
+## 电脑端安装使用
 
 **`YXLogDecode`** 需要JDK（版本需要1.8版本以上的OpenJdk）
 
@@ -108,14 +111,18 @@ bcprov-jdk18on-1.73.jar
 
 ### Android
 
-**`Android`** 上只提供解密核心和一个简单的测试DEMO，如果需要集成到APP中。
+**`Android`** 上提供解密日志和查看日志的APP和解密核心和一个简单的测试DEMO，如果需要集成到APP中。
+**`APP`可以通过分享等其它方式打开日志文件和电脑端的config.ini文件导入密钥**
 
-- 1: 手动集成源码: **`android/decode-core`**
+- 1: 编译APP
+  - 1: 直接编译APP源码: **`android/app`**
 
+- 2: 集成核心
+  - 1: 或自己集成解密源码: **`android/decode-core`**
 
-- 2: 下载源码目录中的：**`jar/decode-core-1.0.aar`**
+  - 2: 或集成打包好的核心-下载源码目录中的：**`jar/decode-core-1.0.aar`**
 
-**然后在build.gradle中增加如下依赖：**
+  - 3: 然后在build.gradle中增加如下依赖：
 ```groovy
 // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
 implementation("org.apache.commons:commons-lang3:3.12.0")
@@ -158,6 +165,9 @@ java.util.concurrent.ExecutionException: java.lang.NullPointerException: Cannot 
     <li><a href="https://github.com/srikanth-lingala/zip4j">zip4j</a></li>
     <li><a href="https://github.com/skylot/jadx">jadx</a></li>
     <li><a href="http://launch4j.sourceforge.net/">Launch4j</a></li>
+    <li><a href="https://github.com/Rosemoe/sora-editor">sora-editor</a></li>
+    <li><a href="https://github.com/AndroidIDEOfficial/AndroidIDE">AndroidIDE</a></li>
+    <li><a href="https://github.com/Blankj/AndroidUtilCode">AndroidUtilCode</a></li>
 </ul>
 
 

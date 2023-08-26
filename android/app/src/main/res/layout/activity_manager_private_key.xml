@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <include
+            layout="@layout/common_toolbar"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_select_private_key"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dp_30"
+        app:layout_constraintTop_toBottomOf="@id/cl_title"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="@dimen/dp_10"
+        android:text="@string/please_select_private_key"
+        android:textSize="@dimen/sp_18"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginStart="@dimen/dp_10"
+        />
+
+    <androidx.appcompat.widget.AppCompatSpinner
+        android:id="@+id/sp_private_key"
+        android:layout_width="@dimen/dp_0"
+        android:layout_height="@dimen/dp_30"
+        app:layout_constraintTop_toBottomOf="@id/tv_select_private_key"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginHorizontal="@dimen/dp_10"
+        android:textSize="@dimen/sp_18"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_select_private_key_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sp_private_key"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="@dimen/dp_10"
+        android:text="@string/private_key_name"
+        android:textSize="@dimen/sp_18"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginStart="@dimen/dp_10"
+        />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/ed_select_private_key_name"
+        android:layout_width="@dimen/dp_0"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_select_private_key_name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginHorizontal="@dimen/dp_10"
+        android:hint="@string/private_key_name_hint"
+        android:textSize="@dimen/sp_18"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        />
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_select_private_key_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/ed_select_private_key_name"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="@dimen/dp_10"
+        android:text="@string/private_key_value"
+        android:textSize="@dimen/sp_18"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginStart="@dimen/dp_10"
+        />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/ed_select_private_key_value"
+        android:layout_width="@dimen/dp_0"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_select_private_key_value"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginHorizontal="@dimen/dp_10"
+        android:hint="@string/private_key_value_hint"
+        android:textSize="@dimen/sp_18"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_save"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        app:layout_constraintTop_toBottomOf="@id/ed_select_private_key_value"
+        android:layout_marginTop="@dimen/dp_60"
+        android:layout_marginHorizontal="@dimen/dp_20"
+        android:text="@string/private_key_save"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="@dimen/sp_20"
+        android:background="@drawable/btn_bg"
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_delete"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        app:layout_constraintTop_toBottomOf="@id/btn_save"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginHorizontal="@dimen/dp_20"
+        android:text="@string/private_key_delete"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="@dimen/sp_20"
+        android:background="@drawable/btn_bg"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

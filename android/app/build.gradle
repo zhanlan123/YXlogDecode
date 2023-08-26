@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
     //如果需要使用kotlin
-    //id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
@@ -24,6 +24,13 @@ android {
         viewBinding true
     }
 
+    androidResources {
+        additionalParameters.add("--warn-manifest-validation")
+    }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -31,8 +38,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 }
 
@@ -41,9 +48,24 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation(platform("io.github.Rosemoe.sora-editor:bom:0.21.1"))
+    def lifecycle_version = "2.6.1"
+    // ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    // LiveData
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
+    implementation 'com.guolindev.permissionx:permissionx:1.7.1'
+    implementation 'com.afollestad.material-dialogs:core:3.3.0'
+    implementation 'com.afollestad.material-dialogs:lifecycle:3.3.0'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
+    implementation "androidx.documentfile:documentfile:1.0.1"
+    implementation 'com.blankj:utilcodex:1.31.1'
+    implementation "com.hgsoft.app:mmkv:1.2301.3"
+    implementation 'org.ini4j:ini4j:0.5.4'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation(platform("io.github.Rosemoe.sora-editor:bom:0.22.0"))
     implementation("io.github.Rosemoe.sora-editor:editor")
-    implementation 'io.github.molihuan:pathselector:1.1.14'
+    implementation 'com.hgsoft.app:loglibrary:1.2301.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

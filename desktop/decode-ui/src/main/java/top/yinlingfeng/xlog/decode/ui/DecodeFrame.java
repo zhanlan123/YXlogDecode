@@ -359,7 +359,7 @@ public class DecodeFrame extends JFrame {
                 "[pref!]" +
                         "[grow,fill]" +
                         "[pref!]",
-                "[][][][][][][]");
+                "[][][][][][grow,fill][]");
         contentPane.setLayout(layout);
     }
 
@@ -577,14 +577,14 @@ public class DecodeFrame extends JFrame {
         LogUtil.i("ItemListener->getActionCommand:" + actionCommand);
         switch (actionCommand) {
             case "选择密钥：":
-                if (e.getStateChange() == 1) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
                     selectPrivateKeyOperation();
                 } else {
                     noSelectJude();
                 }
                 break;
             case "输入密钥：":
-                if (e.getStateChange() == 1) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
                     inputPrivateKeyOperation();
                 } else {
                     noSelectJude();
@@ -778,7 +778,7 @@ public class DecodeFrame extends JFrame {
         clearItem.addActionListener(rightListener);
         //滚动面板
         JScrollPane scrollPane = new JScrollPane(decodeInfotextPane);
-        contentPane.add(scrollPane, "width 230:230:, height 150:150:250, wrap");
+        contentPane.add(scrollPane, "width 230:230:, height 150:150:, wrap");
         //为信息设置不同颜色
         hintFontAttribute = new FontAttribute(1);
         errorFontAttribute = new FontAttribute(2);
@@ -814,6 +814,9 @@ public class DecodeFrame extends JFrame {
                 LogUtil.ei("解密文件不存在！");
                 return;
             }
+            if (privateKeyMode == 0) {
+                LogUtil.ei("没有勾选-选择密钥，或-输入密钥，将只解压缩！");
+            }
             if (inputPrivateKeyInfo.length() == 0) {
                 LogUtil.ei("解密私钥为空，将只解压缩！");
             }
@@ -821,12 +824,12 @@ public class DecodeFrame extends JFrame {
             if (saveLogFileTemp.exists()) {
                 if (!saveLogFileTemp.isDirectory()) {
                     saveLogPath = logFile.getParentFile().getAbsolutePath() + File.separator + logFile.getName().substring(0, logFile.getName().lastIndexOf("."));
-                    LogUtil.ei("选择保存的地址不是文件夹！");
+                    LogUtil.ei("选择保存的地址不是文件夹！使用默认地址。");
                 }
             } else {
                 if (!saveLogFileTemp.mkdirs()) {
                     saveLogPath = logFile.getParentFile().getAbsolutePath() + File.separator + logFile.getName().substring(0, logFile.getName().lastIndexOf("."));
-                    LogUtil.ei("选择的保存的地址，不能创建！");
+                    LogUtil.ei("选择的保存的地址，不能创建！使用默认地址。");
                 }
             }
             if (!saveLogFileTemp.getAbsolutePath().equals(saveLogPath)) {
@@ -997,6 +1000,9 @@ public class DecodeFrame extends JFrame {
     private void startDecodeLogFile(String logFilePath) {
         String saveLogPath = logDecodeSavePathTextField.getText().trim();
         String inputPrivateKeyInfo = inputPrivateKeyTextArea.getText().trim();
+        if (privateKeyMode == 0) {
+            inputPrivateKeyInfo = "";
+        }
         new DecodeLogTask(logFilePath, saveLogPath, inputPrivateKeyInfo).execute();
     }
 

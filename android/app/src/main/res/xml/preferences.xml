@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SwitchPreferenceCompat
+        app:icon="@drawable/select_private_key"
+        app:key="select_private_key"
+        app:title="@string/select_default_private_key_title"
+        app:summary="@string/select_default_private_key_hint"
+        app:defaultValue="true"
+        />
+</PreferenceScreen>

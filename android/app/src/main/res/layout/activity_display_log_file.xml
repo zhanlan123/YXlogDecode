@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_title"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_50"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+            <include
+                layout="@layout/common_toolbar"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <io.github.rosemoe.sora.widget.CodeEditor
+            android:id="@+id/code_editor"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_0"
+            app:layout_constraintTop_toBottomOf="@id/cl_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="@dimen/dp_56"
+            android:scrollbarThumbHorizontal="@drawable/scrollbar_thumb"
+            android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+            android:scrollbarTrackHorizontal="@drawable/scrollbar_track"
+            android:scrollbarTrackVertical="@drawable/scrollbar_track"
+            app:lnPanelPosition="center"
+            app:lnPanelPositionMode="follow" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/search_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/cl_title"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:background="@color/white"
+            >
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_goto_last"
+                android:layout_width="@dimen/dp_50"
+                android:layout_height="@dimen/dp_40"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_marginEnd="@dimen/dp_10"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+
+                android:onClick="gotoLast"
+                android:text="@string/layout_tv_last"
+
+                 />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_goto_next"
+                android:layout_width="@dimen/dp_50"
+                android:layout_height="@dimen/dp_40"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_marginEnd="@dimen/dp_10"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btn_goto_last"
+                android:onClick="gotoNext"
+                android:text="@string/layout_tv_next"
+                />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_replace"
+                android:layout_width="@dimen/dp_50"
+                android:layout_height="@dimen/dp_40"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_marginEnd="@dimen/dp_10"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btn_goto_next"
+                android:onClick="replace"
+                android:text="@string/layout_tv_replace"
+                 />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btn_replace_all"
+                android:layout_width="@dimen/dp_70"
+                android:layout_height="@dimen/dp_40"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_marginEnd="@dimen/dp_10"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btn_replace"
+                android:onClick="replaceAll"
+                android:text="@string/layout_tv_replaceAll"
+                 />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/search_options"
+                android:layout_width="@dimen/dp_50"
+                android:layout_height="@dimen/dp_40"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_marginEnd="@dimen/dp_10"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btn_replace_all"
+                android:onClick="showSearchOptions"
+                android:text="@string/layout_tv_search_options"
+                 />
+
+            <EditText
+                android:id="@+id/search_editor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/btn_goto_last"
+                android:hint="@string/text_to_search" />
+
+            <EditText
+                android:id="@+id/replace_editor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/search_editor"
+                android:hint="@string/replacement" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/position_display"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_56"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:gravity="center"
+            android:textSize="13sp" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/endNav"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:fitsSystemWindows="false">
+
+        <!-- When changing android:tag here, also change it in FileTreeFragment.kt -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/file_tree"
+            android:name="top.yinlingfeng.xlog.decode.filetree.FileTreeFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:tag="editor.fileTree" />
+
+    </com.google.android.material.navigation.NavigationView>
+
+</androidx.drawerlayout.widget.DrawerLayout>

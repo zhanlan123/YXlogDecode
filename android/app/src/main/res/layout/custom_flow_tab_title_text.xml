@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.AppCompatTextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/custom_flow_text"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:background="?attr/selectableItemBackgroundBorderless"
+    android:gravity="center"
+    android:minWidth="@dimen/dp_90"
+    android:singleLine="true"
+    android:textColor="@color/custom_tab_color"
+    android:textSize="@dimen/sp_15"
+    />

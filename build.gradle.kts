@@ -1,7 +1,18 @@
 allprojects {
     repositories {
+        mavenLocal()
         google()
         mavenCentral()
+        maven {
+            credentials {
+                username = "6247fd667e8dbc28d8a2212c"
+                password = "(4e])luJ1RG8"
+            }
+            url = java.net.URI("https://packages.aliyun.com/maven/repository/2117453-release-bMZITa/")
+        }
+        maven { url = java.net.URI("https://maven.aliyun.com/repository/google") }
+        maven { url = java.net.URI("https://maven.aliyun.com/repository/public") }
+        maven { url = java.net.URI("https://jitpack.io") }
     }
 }
 
