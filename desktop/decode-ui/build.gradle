@@ -88,7 +88,6 @@ startScripts {
 
 launch4j {
 	mainClassName = application.mainClass.get()
-	copyConfigurable = project.tasks.shadowJar.outputs.files
 	jarTask = project.tasks.shadowJar
 	icon = "${projectDir}/src/main/resources/logo/logo.ico"
 	outfile = "decode-ui-${YXLogDecodeVersion}.exe"
