@@ -86,12 +86,8 @@ public class MainActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
         WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView()).setAppearanceLightStatusBars(true);
-        if (decodeXlogFileViewModel == null) {
-            decodeXlogFileViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(DecodeXlogFileViewModel.class);
-        }
-        if (importPcConfigIniFileViewModel == null) {
-            importPcConfigIniFileViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(ImportPcConfigIniFileViewModel.class);
-        }
+        decodeXlogFileViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(DecodeXlogFileViewModel.class);
+        importPcConfigIniFileViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(ImportPcConfigIniFileViewModel.class);
         initView();
         setClickListener();
         dealWithActionSend(getIntent());
@@ -135,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, DisplayLogFileActivity.class));
         });
         binding.clCleanHistory.setOnClickListener(view -> {
-            delHistroyRecord();
+            delHistoryRecord();
         });
         binding.clSetting.setOnClickListener(view -> {
             startActivity(new Intent(MainActivity.this, SettingActivity.class));
@@ -146,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         LogUtil.i(TAG, "onNewIntent：" + intent.toString());
+        decodeXlogFileViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(DecodeXlogFileViewModel.class);
+        importPcConfigIniFileViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(ImportPcConfigIniFileViewModel.class);
         dealWithActionSend(intent);
     }
 
@@ -263,12 +261,13 @@ public class MainActivity extends AppCompatActivity {
             LogUtil.i(TAG, "解密成功：" + result);
             LoadingDialog.dismiss();
             ToastUtils.showShort(result);
+            LogUtil.i(TAG, "开始查看");
             Intent showLogIntent = new Intent(MainActivity.this, DisplayLogFileActivity.class);
             showLogIntent.putExtra(FileTreeFragment.FILE_PATH, result);
             startActivity(showLogIntent);
         });
         MainThreadExecutor.getInstance().execute(() -> LoadingDialog.show(MainActivity.this));
-        decodeXlogFileViewModel.decodeZipXlogFile(inputStream, fileName);
+        decodeXlogFileViewModel.decodeZipXlogFile(inputStream, fileName, MMKVConstants.INSTANCE.getCurrentSelectPrivateKey().getKey());
     }
 
     private void startDecodeFile(InputStream inputStream, String fileName) {
@@ -284,12 +283,13 @@ public class MainActivity extends AppCompatActivity {
             LogUtil.i(TAG, "解密成功：" + result);
             LoadingDialog.dismiss();
             ToastUtils.showShort(result);
+            LogUtil.i(TAG, "开始查看");
             Intent showLogIntent = new Intent(MainActivity.this, DisplayLogFileActivity.class);
             showLogIntent.putExtra(FileTreeFragment.FILE_PATH, result);
             startActivity(showLogIntent);
         });
         MainThreadExecutor.getInstance().execute(() -> LoadingDialog.show(MainActivity.this));
-        decodeXlogFileViewModel.decodeXlogFile(inputStream, fileName);
+        decodeXlogFileViewModel.decodeXlogFile(inputStream, fileName, MMKVConstants.INSTANCE.getCurrentSelectPrivateKey().getKey());
     }
 
     private void importConfigIni(InputStream inputStream, String fileName) {
@@ -326,6 +326,7 @@ public class MainActivity extends AppCompatActivity {
             LogUtil.i(TAG, "复制成功：" + result);
             LoadingDialog.dismiss();
             ToastUtils.showShort(result);
+            LogUtil.i(TAG, "开始查看");
             Intent showLogIntent = new Intent(MainActivity.this, DisplayLogFileActivity.class);
             showLogIntent.putExtra(FileTreeFragment.FILE_PATH, result);
             startActivity(showLogIntent);
@@ -334,7 +335,7 @@ public class MainActivity extends AppCompatActivity {
         decodeXlogFileViewModel.copyFile(inputStream, fileName);
     }
 
-    private void delHistroyRecord() {
+    private void delHistoryRecord() {
         decodeXlogFileViewModel.delHistoryRecord.removeObservers(MainActivity.this);
         decodeXlogFileViewModel.delHistoryRecord.observe(MainActivity.this, booleanEvent -> {
             LoadingDialog.dismiss();

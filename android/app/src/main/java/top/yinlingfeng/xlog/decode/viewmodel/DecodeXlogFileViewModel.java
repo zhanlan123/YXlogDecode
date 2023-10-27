@@ -14,11 +14,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
-import top.yinlingfeng.xlog.decode.constants.MMKVConstants;
 import top.yinlingfeng.xlog.decode.core.XLogFileDecode;
 import top.yinlingfeng.xlog.decode.utils.Event;
 import top.yinlingfeng.xlog.decode.utils.ThreadPoolUtils;
 import com.hgsoft.log.LogUtil;
+
+
+
 /**
  * <p>用途：</p>
  *
@@ -57,7 +59,7 @@ public class DecodeXlogFileViewModel extends AndroidViewModel {
     /**
      * 当前选择的密钥
      */
-    private final String privateKey = MMKVConstants.INSTANCE.getCurrentSelectPrivateKey().getKey();
+    private String privateKey = "";
 
 
     /**
@@ -72,7 +74,8 @@ public class DecodeXlogFileViewModel extends AndroidViewModel {
     /**
      * 解密压缩的日志文件
      */
-    public void decodeZipXlogFile(InputStream inputStream, String fileName) {
+    public void decodeZipXlogFile(InputStream inputStream, String fileName, String privateKey) {
+        this.privateKey = privateKey;
         ThreadPoolUtils.execute(() -> {
             try {
                 allLogFilesPath.clear();
@@ -98,9 +101,13 @@ public class DecodeXlogFileViewModel extends AndroidViewModel {
                     File saveFileDir = new File(saveLogFilePath);
                     if (saveFileDir.isDirectory()) {
                         getAllFilePath(saveFileDir);
+                    } else {
+                        _decodeXLogFail.postValue(new Event<>("解密失败,不存在解密文件夹！"));
                     }
                     if (allLogFilesPath.size() > 0) {
                         buildDataLogFileQueue(allLogFilesPath);
+                    } else {
+                        _decodeXLogFail.postValue(new Event<>("解密失败，没有需要解密的文件！"));
                     }
                 }
             } catch (IOException e) {
@@ -114,7 +121,8 @@ public class DecodeXlogFileViewModel extends AndroidViewModel {
     /**
      * 直接界面日志文件
      */
-    public void decodeXlogFile(InputStream inputStream, String fileName) {
+    public void decodeXlogFile(InputStream inputStream, String fileName, String privateKey) {
+        this.privateKey = privateKey;
         ThreadPoolUtils.execute(() -> {
             try {
                 LogUtil.i(TAG, "fileName：" + fileName);
@@ -213,6 +221,9 @@ public class DecodeXlogFileViewModel extends AndroidViewModel {
     private void startDecodeLogFile(String logFilePath) throws IOException {
         LogUtil.i(TAG, "开始解密：" + logFilePath);
         String outFilePath = logFilePath + ".log";
+        LogUtil.i(TAG, "logFilePath:" + logFilePath);
+        LogUtil.i(TAG, "outFilePath:" + outFilePath);
+        LogUtil.i(TAG, "privateKey:" + privateKey);
         XLogFileDecode.parseFile(logFilePath, outFilePath, privateKey);
         pollingDecode();
     }
@@ -225,28 +236,31 @@ public class DecodeXlogFileViewModel extends AndroidViewModel {
             try {
                 File externalFileDir = getApplication().getExternalFilesDir("decodeLog");
                 if (externalFileDir == null) {
-                    _delHistoryRecord.postValue(new Event<>(true));
+                    _delHistoryRecord.postValue(new Event<>(false));
                     return;
                 }
                 if (!externalFileDir.exists()) {
-                    _delHistoryRecord.postValue(new Event<>(true));
+                    _delHistoryRecord.postValue(new Event<>(false));
                     return;
                 }
-                File[] fileArray = externalFileDir.listFiles();
-                if (fileArray == null) {
-                    _delHistoryRecord.postValue(new Event<>(true));
-                    return;
-                }
-                for (File file : fileArray) {
-                    boolean result = file.delete();
-                    LogUtil.i(TAG, file.getName() + "->删除结果:" + result);
-                }
+                deleteAllFile(externalFileDir);
                 _delHistoryRecord.postValue(new Event<>(true));
             } catch (Exception e) {
                 LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
                 _decodeXLogFail.postValue(new Event<>("复制失败！"));
             }
         });
+    }
+
+    private void deleteAllFile(File file) {
+        File[] list = file.listFiles();
+        if (list != null) {
+            for (File temp : list) {
+                deleteAllFile(temp);
+            }
+        }
+        boolean result = file.delete();
+        LogUtil.i(TAG, file.getName() + "->删除结果:" + result);
     }
 
 }
