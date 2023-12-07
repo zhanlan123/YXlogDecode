@@ -31,11 +31,13 @@
 
 ## 电脑端安装使用
 
-**`YXLogDecode`** 需要JDK（版本需要1.8版本以上的OpenJdk）
+**`YXLogDecode`** 需要JDK（版本需要1.8版本以上的OpenJdk，具体看你Android Studio的版本）
 
 **`Windows`** 系统可以直接下载[Release](https://github.com/zhanlan123/YXlogDecode/releases)下的已经打成zip压缩包的文件，里面自带JRE。
 
 **`MAC,Linux`** 直接下载[Release](https://github.com/zhanlan123/YXlogDecode/releases)下的jar文件，然后自行下载OpenJdk。
+
+**`桌面端更新`** 只需要覆盖exe文件和jre目录，**`config.ini`** 可以使用旧的。
 
 如果使用 **`OracleJdk`** 那么请按照下面方式修改：
 
