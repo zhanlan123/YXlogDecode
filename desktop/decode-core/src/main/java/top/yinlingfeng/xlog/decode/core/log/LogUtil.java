@@ -55,12 +55,11 @@ public final class LogUtil {
             } else {
                 mLogInfo.log(LogLevel.LEVEL_VERBOSE, tagName, msg);
             }
+        }
+        if (tagName == null || tagName.length() == 0) {
+            LOGGER.log(Level.ALL, TAG + ": " + msg);
         } else {
-            if (tagName == null || tagName.length() == 0) {
-                LOGGER.log(Level.ALL, TAG + ": " + msg);
-            } else {
-                LOGGER.log(Level.ALL,tagName + ": " + msg);
-            }
+            LOGGER.log(Level.ALL,tagName + ": " + msg);
         }
     }
 

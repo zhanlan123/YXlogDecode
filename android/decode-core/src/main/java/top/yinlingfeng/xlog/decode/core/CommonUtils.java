@@ -1,13 +1,21 @@
 package top.yinlingfeng.xlog.decode.core;
 
 import com.github.luben.zstd.*;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterOutputStream;
 
+import top.yinlingfeng.xlog.decode.core.log.LogUtil;
+
 public class CommonUtils {
+
+    private static final String TAG = "CommonUtils";
 
     private static byte charToByte(char c) {
         return (byte) "0123456789ABCDEF".indexOf(c);
@@ -145,9 +153,10 @@ public class CommonUtils {
             zos.close();
             return bos.toByteArray();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LogUtil.ei(TAG, "解压缩出错可能丢失日志");
+            LogUtil.ei(TAG, "错误信息:" + ExceptionUtils.getStackTrace(ex));
         }
-        return null;
+        return "解压缩出错可能丢失日志\n".getBytes(StandardCharsets.UTF_8);
     }
 
     public static byte[] zstdDecompress(byte[] encodeData) {
@@ -169,7 +178,8 @@ public class CommonUtils {
             bin.close();
             bout.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LogUtil.ei(TAG, "解压缩出错可能丢失日志");
+            LogUtil.ei(TAG, "错误信息:" + ExceptionUtils.getStackTrace(e));
         }
         return bout.toByteArray();
     }

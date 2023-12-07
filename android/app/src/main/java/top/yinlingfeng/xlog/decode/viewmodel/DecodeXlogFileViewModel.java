@@ -111,15 +111,16 @@ public class DecodeXlogFileViewModel extends AndroidViewModel {
                     }
                 }
             } catch (IOException e) {
-                LogUtil.e("异常信息：解密存在异常！");
-                _decodeXLogFail.postValue(new Event<>("解密失败！"));
+                LogUtil.e("ZIP文件存在异常！");
+                LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
+                _decodeXLogFail.postValue(new Event<>("解密失败：ZIP文件存在异常！"));
             }
 
         });
     }
 
     /**
-     * 直接界面日志文件
+     * 直接解密日志文件
      */
     public void decodeXlogFile(InputStream inputStream, String fileName, String privateKey) {
         this.privateKey = privateKey;

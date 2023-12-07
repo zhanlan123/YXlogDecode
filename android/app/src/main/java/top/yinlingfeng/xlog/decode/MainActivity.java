@@ -25,6 +25,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import top.yinlingfeng.xlog.decode.bean.PrivateKey;
 import top.yinlingfeng.xlog.decode.constants.MMKVConstants;
+import top.yinlingfeng.xlog.decode.core.log.LogInfo;
+import top.yinlingfeng.xlog.decode.core.log.LogLevel;
 import top.yinlingfeng.xlog.decode.databinding.ActivityMainBinding;
 import top.yinlingfeng.xlog.decode.dialog.LoadingDialog;
 import top.yinlingfeng.xlog.decode.dialog.ManagerKeyDialog;
@@ -85,12 +87,39 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+        setXDecodeCoreLog();
         WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView()).setAppearanceLightStatusBars(true);
         decodeXlogFileViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(DecodeXlogFileViewModel.class);
         importPcConfigIniFileViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(ImportPcConfigIniFileViewModel.class);
         initView();
         setClickListener();
         dealWithActionSend(getIntent());
+    }
+
+    private void setXDecodeCoreLog() {
+        top.yinlingfeng.xlog.decode.core.log.LogUtil.setmLogInfo(new LogInfo() {
+            @Override
+            public void log(LogLevel priority, String tag, String message) {
+                switch (priority) {
+                    case LEVEL_DEBUG:
+                        LogUtil.d(tag, message);
+                        break;
+                    case LEVEL_INFO:
+                        LogUtil.i(tag, message);
+                        break;
+                    case LEVEL_WARNING:
+                        LogUtil.w(tag, message);
+                        break;
+                    case LEVEL_ERROR:
+                    case LEVEL_EXTRA:
+                        LogUtil.e(tag, message);
+                        break;
+                    case LEVEL_VERBOSE:
+                        LogUtil.v(tag, message);
+                        break;
+                }
+            }
+        });
     }
 
     private void initView() {
@@ -191,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (FileNotFoundException e) {
             LogUtil.i("异常信息：" + ExceptionUtils.getStackTrace(e));
-            ToastUtils.showShort(getString(R.string.analysis_file_fail));
+            ToastUtils.showLong(getString(R.string.analysis_file_fail));
         }
     }
 
@@ -217,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (FileNotFoundException e) {
             LogUtil.i("异常信息：" + ExceptionUtils.getStackTrace(e));
-            ToastUtils.showShort(getString(R.string.analysis_file_fail));
+            ToastUtils.showLong(getString(R.string.analysis_file_fail));
         }
     }
 
@@ -253,14 +282,14 @@ public class MainActivity extends AppCompatActivity {
         decodeXlogFileViewModel.decodeXLogFail.observe(MainActivity.this, stringEvent -> {
             LogUtil.i(TAG, "解密失败");
             LoadingDialog.dismiss();
-            ToastUtils.showShort(stringEvent.peekContent());
+            ToastUtils.showLong(stringEvent.peekContent());
         });
         decodeXlogFileViewModel.decodeXLogSuccess.removeObservers(MainActivity.this);
         decodeXlogFileViewModel.decodeXLogSuccess.observe(MainActivity.this, stringEvent -> {
             String result = stringEvent.peekContent();
             LogUtil.i(TAG, "解密成功：" + result);
             LoadingDialog.dismiss();
-            ToastUtils.showShort(result);
+            ToastUtils.showLong(result);
             LogUtil.i(TAG, "开始查看");
             Intent showLogIntent = new Intent(MainActivity.this, DisplayLogFileActivity.class);
             showLogIntent.putExtra(FileTreeFragment.FILE_PATH, result);
@@ -275,14 +304,14 @@ public class MainActivity extends AppCompatActivity {
         decodeXlogFileViewModel.decodeXLogFail.observe(MainActivity.this, stringEvent -> {
             LogUtil.i(TAG, "解密失败");
             LoadingDialog.dismiss();
-            ToastUtils.showShort(stringEvent.peekContent());
+            ToastUtils.showLong(stringEvent.peekContent());
         });
         decodeXlogFileViewModel.decodeXLogSuccess.removeObservers(MainActivity.this);
         decodeXlogFileViewModel.decodeXLogSuccess.observe(MainActivity.this, stringEvent -> {
             String result = stringEvent.peekContent();
             LogUtil.i(TAG, "解密成功：" + result);
             LoadingDialog.dismiss();
-            ToastUtils.showShort(result);
+            ToastUtils.showLong(result);
             LogUtil.i(TAG, "开始查看");
             Intent showLogIntent = new Intent(MainActivity.this, DisplayLogFileActivity.class);
             showLogIntent.putExtra(FileTreeFragment.FILE_PATH, result);
@@ -299,13 +328,13 @@ public class MainActivity extends AppCompatActivity {
             LoadingDialog.dismiss();
             switch (result) {
                 case FAIL:
-                    ToastUtils.showShort(getString(R.string.import_private_key_fail));
+                    ToastUtils.showLong(getString(R.string.import_private_key_fail));
                     break;
                 case SUCCESS:
-                    ToastUtils.showShort(getString(R.string.import_private_key_success));
+                    ToastUtils.showLong(getString(R.string.import_private_key_success));
                     break;
                 default:
-                    ToastUtils.showShort(getString(R.string.import_private_key_empty));
+                    ToastUtils.showLong(getString(R.string.import_private_key_empty));
                     break;
             }
         });
@@ -318,14 +347,14 @@ public class MainActivity extends AppCompatActivity {
         decodeXlogFileViewModel.decodeXLogFail.observe(MainActivity.this, stringEvent -> {
             LogUtil.i(TAG, "复制失败");
             LoadingDialog.dismiss();
-            ToastUtils.showShort(stringEvent.peekContent());
+            ToastUtils.showLong(stringEvent.peekContent());
         });
         decodeXlogFileViewModel.decodeXLogSuccess.removeObservers(MainActivity.this);
         decodeXlogFileViewModel.decodeXLogSuccess.observe(MainActivity.this, stringEvent -> {
             String result = stringEvent.peekContent();
             LogUtil.i(TAG, "复制成功：" + result);
             LoadingDialog.dismiss();
-            ToastUtils.showShort(result);
+            ToastUtils.showLong(result);
             LogUtil.i(TAG, "开始查看");
             Intent showLogIntent = new Intent(MainActivity.this, DisplayLogFileActivity.class);
             showLogIntent.putExtra(FileTreeFragment.FILE_PATH, result);
@@ -341,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
             LoadingDialog.dismiss();
             boolean result = booleanEvent.peekContent();
             LogUtil.i(TAG, "删除结果:" + result);
-            ToastUtils.showShort(getString(R.string.del_history_record) + ":" + result);
+            ToastUtils.showLong(getString(R.string.del_history_record) + ":" + result);
         });
         MainThreadExecutor.getInstance().execute(() -> LoadingDialog.show(MainActivity.this));
         decodeXlogFileViewModel.delHistoryRecord();

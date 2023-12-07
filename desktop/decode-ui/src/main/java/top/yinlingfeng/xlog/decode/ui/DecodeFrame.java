@@ -325,8 +325,10 @@ public class DecodeFrame extends JFrame {
         public void log(LogLevel priority, String tag, String message) {
             if (priority == LogLevel.LEVEL_ERROR) {
                 decodeInfoText(message, errorFontAttribute);
+                LOGGER.info(message);
             } else if (priority == LogLevel.LEVEL_EXTRA){
                 decodeInfoText(message, hintFontAttribute);
+                LOGGER.info(message);
             } else {
                 LOGGER.info(message);
             }
@@ -924,7 +926,8 @@ public class DecodeFrame extends JFrame {
                     ZipFile zipFile = new ZipFile(zipFilePath);
                     zipFile.extractAll(saveFilePath);
                 } catch (ZipException e) {
-                    LogUtil.ei("异常信息：压缩文件存在异常！");
+                    LogUtil.ei("ZIP文件存在异常！");
+                    LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
                 }
                 File saveFileDir = new File(saveFilePath);
                 if (saveFileDir.isDirectory()) {

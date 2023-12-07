@@ -39,7 +39,9 @@ public class XLogFileDecode {
     }
 
     private static boolean IsGoodLogBuffer(byte[] _buffer, int _offset, int count) {
-        if (_offset == _buffer.length) return true;
+        if (_offset == _buffer.length) {
+            return true;
+        }
 
         int crypt_key_len;
         byte magic_start = _buffer[_offset];
@@ -88,7 +90,9 @@ public class XLogFileDecode {
     private static int GetLogStartPos(byte[] _buffer, int _count){
         int offset = 0;
         while (true) {
-            if (offset >= _buffer.length) break;
+            if (offset >= _buffer.length) {
+                break;
+            }
 
             if (MAGIC_NO_COMPRESS_START==_buffer[offset] ||
                     MAGIC_NO_COMPRESS_START1==_buffer[offset] ||
@@ -101,7 +105,9 @@ public class XLogFileDecode {
                     MAGIC_SYNC_NO_CRYPT_ZSTD_START == _buffer[offset] ||
                     MAGIC_ASYNC_ZSTD_START == _buffer[offset] ||
                     MAGIC_ASYNC_NO_CRYPT_ZSTD_START == _buffer[offset]){
-                if(IsGoodLogBuffer(_buffer, offset, _count)) return offset;
+                if(IsGoodLogBuffer(_buffer, offset, _count)) {
+                    return offset;
+                }
             }
 
             offset += 1;
@@ -112,7 +118,9 @@ public class XLogFileDecode {
 
     private static RetData DecodeBuffer(byte[] _buffer, int _offset, int lastseq, StringBuffer _outbuffer, String privateKey){
         RetData retData = new RetData(_offset, lastseq);
-        if (_offset >= _buffer.length) return new RetData(-1, lastseq);
+        if (_offset >= _buffer.length) {
+            return new RetData(-1, lastseq);
+        }
 
         boolean ret = IsGoodLogBuffer(_buffer, _offset, 1);
         byte[] tmpbuffer = new byte[_buffer.length - _offset];
@@ -212,7 +220,9 @@ public class XLogFileDecode {
             return retData;
         }
 
-        _outbuffer.append(new String(tmpbuffer));
+        if (tmpbuffer != null) {
+            _outbuffer.append(new String(tmpbuffer));
+        }
 
         retData.startPos = _offset + headerLen + length + 1;
         return retData;
@@ -258,10 +268,14 @@ public class XLogFileDecode {
             while (true) {
                 LogUtil.i(TAG, retData.startPos + ":" + retData.lastSeq);
                 retData = DecodeBuffer(_buffer, retData.startPos, retData.lastSeq, outbuffer, privateKey);
-                if (-1 == retData.startPos) break;
+                if (-1 == retData.startPos) {
+                    break;
+                }
             }
 
-            if (0 == outbuffer.length()) return;
+            if (0 == outbuffer.length()) {
+                return;
+            }
 
             os = new FileOutputStream(_outfile);
             writer = new OutputStreamWriter(os);
