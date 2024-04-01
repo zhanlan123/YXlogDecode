@@ -1,2 +1,10 @@
-*.xml linguist-language=java
-*.xlog linguist-language=java
+*.xml linguist-language=Java
+*.xlog linguist-language=Java
+*.ttf linguist-language=Java
+*.jks linguist-language=Java
+*.jar linguist-language=Java
+*.aar linguist-language=Java
+*.pro linguist-language=Txt
+*.ini linguist-language=Txt
+*.gradle linguist-language=Groovy
+*.kts linguist-language=Kotlin
