@@ -1,4 +1,5 @@
 *.xml linguist-language=Java
+*.java linguist-language=Java
 *.xlog linguist-language=Java
 *.ttf linguist-language=Java
 *.jks linguist-language=Java
@@ -6,5 +7,12 @@
 *.aar linguist-language=Java
 *.pro linguist-language=Txt
 *.ini linguist-language=Txt
+*.md linguist-language=Txt
+*.properties linguist-language=Txt
+*.png linguist-language=Txt
 *.gradle linguist-language=Groovy
 *.kts linguist-language=Kotlin
+*.kt linguist-language=Kotlin
+*.inc linguist-language=C
+*.h linguist-language=C
+*.cpp linguist-language=C++
