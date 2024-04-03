@@ -6,6 +6,9 @@ import android.util.Log;
 import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.tencent.mars.BuildConfig;
+
 import top.yinlingfeng.xlog.createxlogfile.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,25 +31,19 @@ public class MainActivity extends AppCompatActivity {
 
     private View.OnClickListener onClickListener = v -> {
         int viewId = v.getId();
-        switch (viewId) {
-            case R.id.btn_init_log:
-                initLog();
-                LogUtil.i(TAG, systemInfo(MainActivity.this));
-                LogUtil.appenderFlush(false);
-                break;
-            case R.id.btn_close_log:
-                LogUtil.appenderClose();
-                break;
-            case R.id.btn_print_log:
-                LogUtil.v(TAG, "测试日志-v");
-                LogUtil.d(TAG, "测试日志-d");
-                LogUtil.i(TAG, "测试日志-i");
-                LogUtil.w(TAG, "测试日志-w");
-                LogUtil.e(TAG, "测试日志-e");
-                LogUtil.appenderFlush(true);
-                break;
-            default:
-                break;
+        if (viewId == R.id.btn_init_log) {
+            initLog();
+            LogUtil.i(TAG, systemInfo(MainActivity.this));
+            LogUtil.appenderFlush(false);
+        } else if (viewId == R.id.btn_close_log) {
+            LogUtil.appenderClose();
+        } else {
+            LogUtil.v(TAG, "测试日志-v");
+            LogUtil.d(TAG, "测试日志-d");
+            LogUtil.i(TAG, "测试日志-i");
+            LogUtil.w(TAG, "测试日志-w");
+            LogUtil.e(TAG, "测试日志-e");
+            LogUtil.appenderFlush(true);
         }
     };
 

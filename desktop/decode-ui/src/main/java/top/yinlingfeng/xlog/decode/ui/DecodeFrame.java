@@ -6,9 +6,13 @@ import com.formdev.flatlaf.extras.FlatSVGUtils;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.miginfocom.swing.MigLayout;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.ini4j.Wini;
+
+import top.yinlingfeng.xlog.decode.core.ECDHUtils;
 import top.yinlingfeng.xlog.decode.core.XLogFileDecode;
 import top.yinlingfeng.xlog.decode.core.log.LogInfo;
 import top.yinlingfeng.xlog.decode.core.log.LogLevel;
@@ -22,6 +26,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
+
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -31,6 +37,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -62,12 +73,16 @@ public class DecodeFrame extends JFrame {
     private JComboBox<PrivateKeyInfo> selectPrivateKeyInfoComboBox;
     //删除密钥
     private JButton btnDeletePrivateKeyInfoButton;
-    //输入密钥选择框
+    //输入私钥选择框
     private JCheckBox inputPrivateKeyCheckBox;
-    //密钥输入框
+    //私钥输入框
     private JTextArea inputPrivateKeyTextArea;
+    //公钥输入框
+    private JTextArea inputPublicKeyTextArea;
     //保存密钥
     private JButton btnSavePrivateKeyInfoButton;
+    //保存密钥
+    private JButton btnGenPrivateKeyInfoButton;
     //解密成功计数
     private JLabel successCountLabel;
     //解密失败计数
@@ -99,7 +114,7 @@ public class DecodeFrame extends JFrame {
     private static final String DEFAULT_LOGO = "/top/yinlingfeng/xlog/decode/ui/logo.svg";
 
     public DecodeFrame() {
-
+        ECDHUtils.init();
         FlatLightLaf.setup();
         //初始化UI
         initView();
@@ -115,8 +130,8 @@ public class DecodeFrame extends JFrame {
         setFont();
         setContentPaneView();
         addSelectLogPathView();
+        addRightMenu();
         addLogPrivateKeyView();
-        //decodeLogDecompressionTypeSelectView();
         decodeLogStatisticsView();
         decodeOperationInfoView();
     }
@@ -249,7 +264,7 @@ public class DecodeFrame extends JFrame {
         if (operationSave.getPrivateKeySelectMode() == 1) {
             selectPrivateKeyCheckBox.setSelected(true);
             btnSavePrivateKeyInfoButton.setText("修改");
-            inputPrivateKeyTextArea.setEnabled(false);
+            inputPrivateKeyTextArea.setEditable(false);
             if (operationSave.getSelectPrivateKeySelectIndex() >= selectPrivateKeyInfoComboBox.getItemCount()) {
                 operationSave.setSelectPrivateKeySelectIndex(0);
             }
@@ -257,9 +272,17 @@ public class DecodeFrame extends JFrame {
         } else {
             inputPrivateKeyCheckBox.setSelected(true);
             btnSavePrivateKeyInfoButton.setText("保存");
-            inputPrivateKeyTextArea.setEnabled(true);
+            inputPrivateKeyTextArea.setEditable(true);
             if (!operationSave.getInputPrivateKeyInfo().isEmpty()) {
                 inputPrivateKeyTextArea.setText(operationSave.getInputPrivateKeyInfo());
+                inputPublicKeyTextArea.setText("");
+                try {
+                    String publicKey = ECDHUtils.derivePublicKey(privateKeyInfo.getPrivateKeyValue());
+                    inputPublicKeyTextArea.setText(publicKey);
+                } catch (Exception ex) {
+                    LogUtil.ei("推算公钥出错:" + ExceptionUtils.getStackTrace(ex));
+                    inputPublicKeyTextArea.setText("推算公钥出错");
+                }
             }
         }
 
@@ -349,7 +372,7 @@ public class DecodeFrame extends JFrame {
     private void setContentPaneView() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds((width - 480) / 2,
-                (height - 550) / 2, 480, 550);
+                (height - 550) / 2, 480, 560);
         setResizable(true);
         setFont(commonFont);
         setTitle("XLog解密" + BuildConfig.YXLogDecodeVersion);
@@ -361,7 +384,7 @@ public class DecodeFrame extends JFrame {
                 "[pref!]" +
                         "[grow,fill]" +
                         "[pref!]",
-                "[][][][][][grow,fill][]");
+                "[][][][][][][grow,fill][]");
         contentPane.setLayout(layout);
     }
 
@@ -466,6 +489,23 @@ public class DecodeFrame extends JFrame {
     }
 
     /**
+     * 增加右键菜单
+     */
+    private void addRightMenu() {
+        //右键菜单
+        //弹出式菜单
+        rightMenu = new JPopupMenu();
+        copyItem = new JMenuItem("复制");
+        clearItem = new JMenuItem("清空");
+        rightMenu.add(copyItem);
+        rightMenu.add(clearItem);
+        rightMenu.setPreferredSize(new Dimension(95, rightMenu.getPreferredSize().height));
+        //设置监听
+        copyItem.addActionListener(rightListener);
+        clearItem.addActionListener(rightListener);
+    }
+
+    /**
      * 增加日志密钥选择或者输入UI
      */
     private void addLogPrivateKeyView() {
@@ -474,6 +514,7 @@ public class DecodeFrame extends JFrame {
         selectPrivateKeyCheckBox.setFont(commonFont);
         selectPrivateKeyCheckBox.setEnabled(true);
         selectPrivateKeyCheckBox.addItemListener(itemListener);
+        selectPrivateKeyCheckBox.setBorder(BorderFactory.createEmptyBorder());
         contentPane.add(selectPrivateKeyCheckBox);
 
         //选择密钥
@@ -499,11 +540,12 @@ public class DecodeFrame extends JFrame {
         });
         contentPane.add(btnDeletePrivateKeyInfoButton, "wrap, width 100:100:100");
 
-        //选择密钥 选择框
-        inputPrivateKeyCheckBox = new JCheckBox("输入密钥：");
+        //输入私钥 选择框
+        inputPrivateKeyCheckBox = new JCheckBox("输入私钥：");
         inputPrivateKeyCheckBox.setFont(commonFont);
         inputPrivateKeyCheckBox.setEnabled(true);
         inputPrivateKeyCheckBox.addItemListener(itemListener);
+        inputPrivateKeyCheckBox.setBorder(BorderFactory.createEmptyBorder());
         contentPane.add(inputPrivateKeyCheckBox);
 
         //密钥输入框
@@ -511,8 +553,14 @@ public class DecodeFrame extends JFrame {
         inputPrivateKeyTextArea.setFont(commonFont);
         inputPrivateKeyTextArea.setColumns(5);
         inputPrivateKeyTextArea.setLineWrap(true);
-        JScrollPane inputJScrollPane = new JScrollPane(inputPrivateKeyTextArea);
-        contentPane.add(inputJScrollPane, "width 230:230:, height 110");
+        inputPrivateKeyTextArea.addMouseListener(inputPrivateKeyTextAreaMouseAdapter);
+        JScrollPane inputPrivateKeyTextAreaScrollPane = new JScrollPane(inputPrivateKeyTextArea);
+        contentPane.add(inputPrivateKeyTextAreaScrollPane, "width 230:230:, height 60");
+
+        JPanel paivateKeyOperationJPanel = new JPanel();
+        paivateKeyOperationJPanel.setLayout(new MigLayout("insets 0 0 0 0",
+                "[pref!][pref!]",
+                "[]"));
 
         //保存密钥
         btnSavePrivateKeyInfoButton = new JButton("保存");
@@ -520,7 +568,32 @@ public class DecodeFrame extends JFrame {
         btnSavePrivateKeyInfoButton.addActionListener(e -> {
             btnSavePrivateKeyInfoOperation();
         });
-        contentPane.add(btnSavePrivateKeyInfoButton, "wrap, width 100:100:100");
+        paivateKeyOperationJPanel.add(btnSavePrivateKeyInfoButton, "wrap, width 100:100:100");
+
+        //生成密钥
+        btnGenPrivateKeyInfoButton = new JButton("生成密钥");
+        btnGenPrivateKeyInfoButton.setFont(commonFont);
+        btnGenPrivateKeyInfoButton.addActionListener(e -> {
+            showSaveGenKeyDialog("生成密钥", "请输入密钥名称");
+        });
+        paivateKeyOperationJPanel.add(btnGenPrivateKeyInfoButton, "wrap, width 100:100:100");
+
+        contentPane.add(paivateKeyOperationJPanel, "wrap, width 100:100:100, height 50");
+
+        //公钥标题
+        JLabel publicKeyHintLabel = new JLabel("公钥信息：");
+        publicKeyHintLabel.setFont(commonFont);
+        contentPane.add(publicKeyHintLabel);
+
+        //公钥输入框
+        inputPublicKeyTextArea = new JTextArea("");
+        inputPublicKeyTextArea.setFont(commonFont);
+        inputPublicKeyTextArea.setColumns(5);
+        inputPublicKeyTextArea.setLineWrap(true);
+        inputPublicKeyTextArea.setEditable(false);
+        inputPublicKeyTextArea.addMouseListener(inputPublicKeyTextAreaMouseAdapter);
+        JScrollPane inputPublicKeyTextAreaJScrollPane = new JScrollPane(inputPublicKeyTextArea);
+        contentPane.add(inputPublicKeyTextAreaJScrollPane, "width 230:230:, height 80, wrap");
     }
 
     /**
@@ -530,13 +603,13 @@ public class DecodeFrame extends JFrame {
         if (privateKeyMode == 1) {
             if (btnSavePrivateKeyInfoButton.getText().equals("修改")) {
                 btnSavePrivateKeyInfoButton.setText("保存");
-                inputPrivateKeyTextArea.setEnabled(true);
+                inputPrivateKeyTextArea.setEditable(true);
             } else {
                 String inputPrivateKeyInfo = inputPrivateKeyTextArea.getText().trim();
                 if (inputPrivateKeyInfo.length() > 0) {
                     addDecodePrivateKey(privateKeyInfo.getPrivateKeyName(), inputPrivateKeyInfo);
                     btnSavePrivateKeyInfoButton.setText("修改");
-                    inputPrivateKeyTextArea.setEnabled(false);
+                    inputPrivateKeyTextArea.setEditable(false);
                     LogUtil.ei("更新密钥成功！");
                 } else {
                     LogUtil.ei("密钥不能为空！");
@@ -545,7 +618,7 @@ public class DecodeFrame extends JFrame {
         } else if (privateKeyMode == 2){
             String inputPrivateKeyInfo = inputPrivateKeyTextArea.getText().trim();
             if (inputPrivateKeyInfo.length() > 0) {
-                showSaveDialog("名称", "请输入密钥名称", inputPrivateKeyInfo);
+                showSaveKeyDialog("名称", "请输入密钥名称", inputPrivateKeyInfo);
             } else {
                 LogUtil.ei("密钥不能为空！");
             }
@@ -563,12 +636,20 @@ public class DecodeFrame extends JFrame {
             privateKeyInfo.setPrivateKeyValue(privateKeyInfoTemp.getPrivateKeyValue());
             inputPrivateKeyTextArea.setText("");
             inputPrivateKeyTextArea.setText(privateKeyInfo.getPrivateKeyValue());
+            inputPublicKeyTextArea.setText("");
+            try {
+                String publicKey = ECDHUtils.derivePublicKey(privateKeyInfo.getPrivateKeyValue());
+                inputPublicKeyTextArea.setText(publicKey);
+            } catch (Exception ex) {
+                LogUtil.ei("推算公钥出错:" + ExceptionUtils.getStackTrace(ex));
+                inputPublicKeyTextArea.setText("推算公钥出错");
+            }
             LogUtil.i(privateKeyInfo.getAllData());
         }
     };
 
     /**
-     * 密钥选择模式：0，未选择；1，选择密钥；2，输入密钥
+     * 密钥选择模式：0，未选择；1，选择密钥；2，输入私钥
      */
     private int privateKeyMode = 0;
 
@@ -585,7 +666,7 @@ public class DecodeFrame extends JFrame {
                     noSelectJude();
                 }
                 break;
-            case "输入密钥：":
+            case "输入私钥：":
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     inputPrivateKeyOperation();
                 } else {
@@ -603,7 +684,15 @@ public class DecodeFrame extends JFrame {
         inputPrivateKeyCheckBox.setSelected(false);
         inputPrivateKeyTextArea.setText("");
         inputPrivateKeyTextArea.setText(privateKeyInfo.getPrivateKeyValue());
-        inputPrivateKeyTextArea.setEnabled(false);
+        inputPublicKeyTextArea.setText("");
+        try {
+            String publicKey = ECDHUtils.derivePublicKey(privateKeyInfo.getPrivateKeyValue());
+            inputPublicKeyTextArea.setText(publicKey);
+        } catch (Exception ex) {
+            LogUtil.ei("推算公钥出错:" + ExceptionUtils.getStackTrace(ex));
+            inputPublicKeyTextArea.setText("推算公钥出错");
+        }
+        inputPrivateKeyTextArea.setEditable(false);
         selectPrivateKeyInfoComboBox.setEnabled(true);
         btnDeletePrivateKeyInfoButton.setEnabled(true);
     }
@@ -614,7 +703,7 @@ public class DecodeFrame extends JFrame {
         selectPrivateKeyCheckBox.setSelected(false);
         selectPrivateKeyInfoComboBox.setEnabled(false);
         btnDeletePrivateKeyInfoButton.setEnabled(false);
-        inputPrivateKeyTextArea.setEnabled(true);
+        inputPrivateKeyTextArea.setEditable(true);
     }
 
     private void noSelectJude() {
@@ -623,7 +712,7 @@ public class DecodeFrame extends JFrame {
         }
     }
 
-    public void showSaveDialog(String title, String hint, String inputPrivateKeyInfo) {
+    public void showSaveKeyDialog(String title, String hint, String inputPrivateKeyInfo) {
         Window window = SwingUtilities.windowForComponent( this );
         String result = (String) JOptionPane.showInputDialog(
                 window,
@@ -634,19 +723,139 @@ public class DecodeFrame extends JFrame {
                 null,
                 null );
         if (result != null && result.length() > 0) {
-            LogUtil.ei("密钥名称:" + result);
-            for (PrivateKeyInfo privateKeyInfo : privateKeyInfoData) {
-                if (privateKeyInfo.getPrivateKeyName().equals(result)) {
-                    LogUtil.ei("已经存在这个名称！");
-                    return;
-                }
-            }
-            int saveIndex = privateKeyInfoData.size();
-            updateDecodePrivateKey(result, inputPrivateKeyInfo);
-            LogUtil.ei("保存密钥成功！");
-            initPrivateKey(saveIndex);
+            saveKeyToIniFile(result, inputPrivateKeyInfo);
         } else {
-            LogUtil.ei("保存密钥失败！");
+            LogUtil.ei("保存密钥失败！没有输入密钥名称！");
+        }
+    }
+
+    /**
+     * 保存密钥到ini文件
+     * @param keyName 密钥名称
+     * @param savePrivateKeyInfo 私钥信息
+     */
+    private void saveKeyToIniFile(String keyName, String savePrivateKeyInfo) {
+        LogUtil.ei("密钥名称:" + keyName);
+        for (PrivateKeyInfo privateKeyInfo : privateKeyInfoData) {
+            if (privateKeyInfo.getPrivateKeyName().equals(keyName)) {
+                LogUtil.ei("已经存在这个名称！");
+                return;
+            }
+        }
+        int saveIndex = privateKeyInfoData.size();
+        updateDecodePrivateKey(keyName, savePrivateKeyInfo);
+        LogUtil.ei("保存密钥成功！");
+        initPrivateKey(saveIndex);
+    }
+
+    /**
+     * 生成密钥
+     * @param title
+     * @param hint
+     */
+    public void showSaveGenKeyDialog(String title, String hint) {
+        Window window = SwingUtilities.windowForComponent( this );
+        String result = (String) JOptionPane.showInputDialog(
+                window,
+                hint,
+                title,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                null,
+                null );
+        if (result != null && result.length() > 0) {
+            try {
+                String[] genKeyResult = ECDHUtils.genECDHKey();
+                saveKeyToIniFile(result, genKeyResult[0]);
+                genSaveKeyFileInfo(result, genKeyResult);
+            } catch (NoSuchAlgorithmException | NoSuchProviderException |
+                     InvalidAlgorithmParameterException e) {
+                LogUtil.ei("生成密钥失败！");
+            }
+        } else {
+            LogUtil.ei("生成密钥失败！没有输入密钥名称！");
+        }
+    }
+
+    /**
+     * 把生成的信息保存到文件
+     * @param keyName 文件名
+     * @param saveKeyInfo 密钥信息
+     */
+    private void genSaveKeyFileInfo(String keyName, String[] saveKeyInfo) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("save private key");
+        stringBuilder.append("\n");
+        stringBuilder.append(saveKeyInfo[0]);
+        stringBuilder.append("\n\n");
+        stringBuilder.append("appender_open's parameter:");
+        stringBuilder.append("\n");
+        stringBuilder.append(saveKeyInfo[1]);
+        showSaveGenKeyToFileDialog("保存", "是否需要把密钥保存到单独文件？", keyName, stringBuilder.toString());
+    }
+
+
+    private void showSaveGenKeyToFileDialog(String title, String hint, String keyName, String saveKeyInfo) {
+        Window window = SwingUtilities.windowForComponent( this );
+        int result = JOptionPane.showConfirmDialog(
+                window,
+                hint,
+                title,
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
+        if (result == 0) {
+            JFileChooser keySaveFileChooser = new JFileChooser();
+            keySaveFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            keySaveFileChooser.setFileSystemView(FileSystemView.getFileSystemView());
+            keySaveFileChooser.setDialogTitle("密钥文件保存位置选择");
+            int showResult = keySaveFileChooser.showOpenDialog(DecodeFrame.this);
+            if (showResult == JFileChooser.APPROVE_OPTION) {
+                decodeLogStartViewStatus();
+                String savePath = keySaveFileChooser.getSelectedFile().getAbsolutePath();
+                new SaveKeyFileTask(savePath + File.separator + keyName + ".txt", saveKeyInfo).execute();;
+            }
+        }
+    }
+
+    private class SaveKeyFileTask extends SwingWorker<Boolean, String>{
+
+        private final String saveKeyFilePath;
+
+        private final String saveKeyInfo;
+
+
+        public SaveKeyFileTask(String saveKeyFilePath, String saveKeyInfo) {
+            this.saveKeyFilePath = saveKeyFilePath;
+            this.saveKeyInfo = saveKeyInfo;
+        }
+
+        @Override
+        protected Boolean doInBackground() {
+            File keyFile = new File(saveKeyFilePath);
+            if (keyFile.exists()) {
+                LogUtil.ei("存在相同文件名！");
+                return false;
+            }
+            try {
+                FileUtils.write(keyFile, saveKeyInfo, StandardCharsets.UTF_8);
+                return true;
+            } catch (IOException e) {
+                LogUtil.ei("保存密钥文件出错！\n" + ExceptionUtils.getStackTrace(e));
+            }
+            return false;
+        }
+
+        @Override
+        protected void done() {
+            try {
+                Boolean result = get();
+                if (result) {
+                    LogUtil.ei("保存密钥文件成功：" + saveKeyFilePath);
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                LogUtil.ei("保存密钥文件出错！\n" + ExceptionUtils.getStackTrace(e));
+            }
+            decodeLogCompleteViewStatus();
         }
     }
 
@@ -702,33 +911,24 @@ public class DecodeFrame extends JFrame {
     }
 
     /**
-     * 日志流式压缩库选择
+     * 私钥输入框监听
      */
-    private void decodeLogDecompressionTypeSelectView() {
-        //统计提示label
-        JLabel decodeHintDecompressionLabelTest = new JLabel("解压格式：");
-        decodeHintDecompressionLabelTest.setFont(commonFont);
-        contentPane.add(decodeHintDecompressionLabelTest);
+    private final MouseAdapter inputPrivateKeyTextAreaMouseAdapter = new MouseAdapter() {
 
-        //选择日志流式解压方式
-        selectDecompressionComboBox = new JComboBox<>();
-        selectDecompressionComboBox.setFont(commonFont);
-        selectDecompressionComboBox.setEditable(false);
-        selectDecompressionComboBox.setEnabled(true);
-        selectDecompressionComboBox.setMaximumRowCount(5);
-        selectDecompressionComboBox.addItem(DecompressionType.ZIP);
-        selectDecompressionComboBox.addItem(DecompressionType.ZSTD);
-        selectDecompressionComboBox.setSelectedIndex(0);
-        selectDecompressionComboBox.addItemListener(decompressionItemListener);
-        contentPane.add(selectDecompressionComboBox, "wrap, width 230:230:");
-    }
+        @Override
+        public void mousePressed(MouseEvent e) {
+            rightMenuOperation(inputPrivateKeyTextArea, e);
+        }
+    };
 
-    // 1:zip，2:zstd
-    private DecompressionType decompressionType = DecompressionType.ZIP;
+    /**
+     * 公钥输入框监听
+     */
+    private final MouseAdapter inputPublicKeyTextAreaMouseAdapter = new MouseAdapter() {
 
-    private final ItemListener decompressionItemListener = e -> {
-        if (e.getStateChange() == ItemEvent.SELECTED) {
-            decompressionType = (DecompressionType)e.getItem();
+        @Override
+        public void mousePressed(MouseEvent e) {
+            rightMenuOperation(inputPublicKeyTextArea, e);
         }
     };
 
@@ -760,24 +960,14 @@ public class DecodeFrame extends JFrame {
 
     private void decodeOperationInfoView() {
         //解密操作提示label
-        JLabel decodeOperationHintLabelTest = new JLabel("操作信息：");
-        decodeOperationHintLabelTest.setFont(commonFont);
-        contentPane.add(decodeOperationHintLabelTest);
+        JLabel decodeOperationHintLabel = new JLabel("操作信息：");
+        decodeOperationHintLabel.setFont(commonFont);
+        contentPane.add(decodeOperationHintLabel);
 
         //展示信息内容
         decodeInfotextPane = new JTextPane();
         decodeInfotextPane.setFont(commonFont);
         decodeInfotextPane.setEditable(true);
-        //右键菜单
-        rightMenu = new JPopupMenu();  //弹出式菜单
-        copyItem = new JMenuItem("复制");
-        clearItem = new JMenuItem("清空");
-        rightMenu.add(copyItem);
-        rightMenu.add(clearItem);
-        rightMenu.setPreferredSize(new Dimension(95, rightMenu.getPreferredSize().height));
-        //设置监听
-        copyItem.addActionListener(rightListener);
-        clearItem.addActionListener(rightListener);
         //滚动面板
         JScrollPane scrollPane = new JScrollPane(decodeInfotextPane);
         contentPane.add(scrollPane, "width 230:230:, height 150:150:, wrap");
@@ -817,7 +1007,7 @@ public class DecodeFrame extends JFrame {
                 return;
             }
             if (privateKeyMode == 0) {
-                LogUtil.ei("没有勾选-选择密钥，或-输入密钥，将只解压缩！");
+                LogUtil.ei("没有勾选-选择密钥，或-输入私钥，将只解压缩！");
             }
             if (inputPrivateKeyInfo.length() == 0) {
                 LogUtil.ei("解密私钥为空，将只解压缩！");
@@ -845,6 +1035,7 @@ public class DecodeFrame extends JFrame {
             updateOperationSave(logFilePath, saveLogPath, privateKeyMode, selectPrivateKeyInfoComboBox.getSelectedIndex(), inputPrivateKeyInfo);
             decodeSuccessCount = 0;
             decodeFailureCount = 0;
+            LogUtil.ei("解密开始运行");
             decodeLogStartViewStatus();
             new UnzipTask(logFilePath, saveLogPath).execute();
         }
@@ -864,31 +1055,54 @@ public class DecodeFrame extends JFrame {
         }
     }
 
-    private String selectString;
 
-    //右键菜单
+    /**
+     * 解密详细信息展示监听
+     */
     private final MouseAdapter decodeTextPaneMouseAdapter = new MouseAdapter() {
 
         @Override
         public void mousePressed(MouseEvent e) {
-            if (e.getButton() == MouseEvent.BUTTON3) {
-                if (rightMenu.isShowing()) {
-                    rightMenu.setEnabled(false);
-                }
-                selectString = decodeInfotextPane.getSelectedText();
-                if (selectString != null && selectString.length() > 0) {
-                    copyItem.setEnabled(true);
-                } else {
-                    copyItem.setEnabled(false);
-                }
-                rightMenu.show(e.getComponent(), e.getX(), e.getY());
-            } else {
-                if (rightMenu.isShowing()) {
-                    rightMenu.setEnabled(false);
-                }
-            }
+            rightMenuOperation(decodeInfotextPane, e);
         }
     };
+
+    /**
+     * 右键菜单选择的信息
+     */
+    private String selectString;
+    private JTextComponent selectTextView;
+
+    /**
+     * 右键菜单
+     * @param textView 输入框
+     * @param mouseEvent 鼠标事件
+     */
+    private void rightMenuOperation(JTextComponent textView, MouseEvent mouseEvent) {
+        if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
+            if (rightMenu.isShowing()) {
+                rightMenu.setEnabled(false);
+            }
+            selectTextView = textView;
+            selectString = "";
+            selectString = textView.getSelectedText();
+            if (selectString != null && selectString.length() > 0) {
+                copyItem.setEnabled(true);
+            } else {
+                copyItem.setEnabled(false);
+            }
+            if (textView.isEditable()) {
+                clearItem.setVisible(true);
+            } else {
+                clearItem.setVisible(false);
+            }
+            rightMenu.show(mouseEvent.getComponent(), mouseEvent.getX(), mouseEvent.getY());
+        } else {
+            if (rightMenu.isShowing()) {
+                rightMenu.setEnabled(false);
+            }
+        }
+    }
 
     private final ActionListener rightListener = new ActionListener() {
 
@@ -898,10 +1112,13 @@ public class DecodeFrame extends JFrame {
             if (e.getActionCommand().equals("复制")) {
                 Utils.setSysClipboardText(selectString);
             } else if (e.getActionCommand().equals("清空")) {
-                decodeInfotextPane.setText(null);
+                selectTextView.setText(null);
             }
         }
     };
+
+    // 解压文件夹名称
+    private final String unzipFolderName = "temp";
 
     private class UnzipTask extends SwingWorker<List<String>, String>{
 
@@ -921,15 +1138,17 @@ public class DecodeFrame extends JFrame {
             allLogFilesPath.clear();
             if (zipFilePath.endsWith(".zip")) {
                 LogUtil.ei("开始解压文件：" + zipFilePath);
+                String destinationPath = saveFilePath + File.separator + unzipFolderName;
+                LogUtil.ei("解压后文件保存目录：" + destinationPath);
                 // 防止因为解压出错，但是实际解压成功，导致不能解密。
                 try {
                     ZipFile zipFile = new ZipFile(zipFilePath);
-                    zipFile.extractAll(saveFilePath);
+                    zipFile.extractAll(destinationPath);
                 } catch (ZipException e) {
                     LogUtil.ei("ZIP文件存在异常！");
                     LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
                 }
-                File saveFileDir = new File(saveFilePath);
+                File saveFileDir = new File(destinationPath);
                 if (saveFileDir.isDirectory()) {
                     getAllFilePath(saveFileDir);
                     return allLogFilesPath;
@@ -968,10 +1187,12 @@ public class DecodeFrame extends JFrame {
                     buildDataLogFileQueue(logFiles);
                 } else {
                     LogUtil.ei("没有发现需要解密的文件！");
+                    LogUtil.ei("解密完成");
                     decodeLogCompleteViewStatus();
                 }
             } catch (InterruptedException | ExecutionException e) {
                 LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
+                LogUtil.ei("解密完成");
                 decodeLogCompleteViewStatus();
             }
         }
@@ -993,11 +1214,42 @@ public class DecodeFrame extends JFrame {
             if (logFileData != null) {
                 startDecodeLogFile(logFileData);
             } else {
+                LogUtil.ei("解密完成");
                 decodeLogCompleteViewStatus();
+                openDecodeLogPath();
             }
         } else {
+            LogUtil.ei("解密完成");
             decodeLogCompleteViewStatus();
+            openDecodeLogPath();
         }
+    }
+
+    /**
+     * 打开解密后文件夹
+     */
+    private void openDecodeLogPath() {
+        String saveLogPath = logDecodeSavePathTextField.getText().trim();
+        try {
+            openDesktopDir(saveLogPath);
+        } catch (IOException e) {
+            LogUtil.ei("打开解密后文件夹失败！\n" + ExceptionUtils.getStackTrace(e));
+        }
+    }
+
+    /**
+     * 打开文件夹
+     * @param dirPath 文件夹地址
+     */
+    private void openDesktopDir(String dirPath) throws IOException {
+        File dirFile = new File(dirPath);
+        if (!dirFile.exists()) {
+            LogUtil.ei("需要打开的文件夹不存在！");
+        }
+        if (!dirFile.isDirectory()) {
+            LogUtil.ei("需要打开的地址不是文件夹！");
+        }
+        Desktop.getDesktop().open(dirFile);
     }
 
     private void startDecodeLogFile(String logFilePath) {
@@ -1057,7 +1309,6 @@ public class DecodeFrame extends JFrame {
     }
 
     private void decodeLogStartViewStatus() {
-        LogUtil.ei("解密开始运行");
         //日志路径输入框
         logPathTextField.setEnabled(false);
         //选择日志路径按钮
@@ -1072,18 +1323,19 @@ public class DecodeFrame extends JFrame {
         selectPrivateKeyInfoComboBox.setEnabled(false);
         //删除密钥
         btnDeletePrivateKeyInfoButton.setEnabled(false);
-        //输入密钥选择框
+        //输入私钥选择框
         inputPrivateKeyCheckBox.setEnabled(false);
-        //密钥输入框
-        inputPrivateKeyTextArea.setEnabled(false);
+        //私钥输入框
+        inputPrivateKeyTextArea.setEditable(false);
         //保存密钥
         btnSavePrivateKeyInfoButton.setEnabled(false);
+        //生成密钥按钮
+        btnGenPrivateKeyInfoButton.setEnabled(false);
         //开始解密按钮
         btnStartDecodeButton.setEnabled(false);
     }
 
     private void decodeLogCompleteViewStatus() {
-        LogUtil.ei("解密完成");
         //日志路径输入框
         logPathTextField.setEnabled(true);
         //选择日志路径按钮
@@ -1099,16 +1351,18 @@ public class DecodeFrame extends JFrame {
             selectPrivateKeyInfoComboBox.setEnabled(true);
             //删除密钥
             btnDeletePrivateKeyInfoButton.setEnabled(true);
-            //密钥输入框
-            inputPrivateKeyTextArea.setEnabled(false);
+            //私钥输入框
+            inputPrivateKeyTextArea.setEditable(false);
         } else {
-            //密钥输入框
-            inputPrivateKeyTextArea.setEnabled(true);
+            //私钥输入框
+            inputPrivateKeyTextArea.setEditable(true);
         }
-        //输入密钥选择框
+        //输入私钥选择框
         inputPrivateKeyCheckBox.setEnabled(true);
         //保存密钥
         btnSavePrivateKeyInfoButton.setEnabled(true);
+        //生成密钥按钮
+        btnGenPrivateKeyInfoButton.setEnabled(true);
         //开始解密按钮
         btnStartDecodeButton.setEnabled(true);
     }

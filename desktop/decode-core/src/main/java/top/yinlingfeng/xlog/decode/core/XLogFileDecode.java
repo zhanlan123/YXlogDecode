@@ -34,10 +34,6 @@ public class XLogFileDecode {
 
     public static byte MAGIC_END = 0x00;
 
-    static {
-        ECDHUtils.init();
-    }
-
     private static boolean IsGoodLogBuffer(byte[] _buffer, int _offset, int count) {
         if (_offset == _buffer.length) {
             return true;
