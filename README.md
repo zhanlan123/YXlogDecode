@@ -2,14 +2,14 @@
 
 # YXLogDecode
 
-![语言](https://img.shields.io/badge/language-C%7CC%2B%2B%7CJava-blue) ![Java](https://img.shields.io/badge/Java-%3E%3D1.8-green) ![Relase](https://img.shields.io/badge/Relase-1.7-yellow)
+![语言](https://img.shields.io/badge/language-C%7CC%2B%2B%7CJava-blue) ![Java](https://img.shields.io/badge/Java-%3E%3D1.8-green) ![Relase](https://img.shields.io/badge/Relase-1.9.1-yellow)
 
 **`YXLogDecode`** 是腾讯Mars-xlog的解密的Java实现版本，核心来自<a href="https://github.com/wustMeiming/XlogDecoder">XlogDecoder</a>。
 - 支持UI操作；
 - 支持压缩加密文件和只压缩文件的解密解压缩；
 - 压缩方式支持：ZIP，ZSTD；
 - 增加了一个可以在Android上运行的解密核心 **`android/decode-core`**；
-- 增加了一个Android上解密查看日志的APP: <a href="https://github.com/zhanlan123/YXlogDecode/releases/download/1.8/XLog_1.8.apk">XLog_1.8.apk</a>；
+- 增加了一个Android上解密查看日志的APP: <a href="https://github.com/zhanlan123/YXlogDecode/releases/download/1.9.1/XLog_1.9.1.apk">XLog_1.9.1.apk</a>；
 
 ### 目录
 

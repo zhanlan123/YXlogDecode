@@ -112,7 +112,7 @@ public class XLogFileDecode {
         return  -1;
     }
 
-    private static RetData DecodeBuffer(byte[] _buffer, int _offset, int lastseq, StringBuffer _outbuffer, String privateKey){
+    private static RetData DecodeBuffer(byte[] _buffer, int _offset, int lastseq, StringBuilder _outbuffer, String privateKey){
         RetData retData = new RetData(_offset, lastseq);
         if (_offset >= _buffer.length) {
             return new RetData(-1, lastseq);
@@ -186,11 +186,9 @@ public class XLogFileDecode {
                     String pubkey_x = CommonUtils.bytesToHexString(byte_pubkey_x);
                     String pubkey_y = CommonUtils.bytesToHexString(byte_pubkey_y);
                     String pubkey = String.format("04%s%s", pubkey_x, pubkey_y);
-                    LogUtil.i(TAG, "pubkey:" + pubkey);
 
                     byte[] tea_key = ECDHUtils.getECDHKey(CommonUtils.hexStringToByteArray(pubkey), CommonUtils.hexStringToBytes(privateKey));
 
-                    LogUtil.i(TAG, "teak_key:" + CommonUtils.bytesToHexString(tea_key));
 
                     tmpbuffer = CommonUtils.tea_decrypt(tmpbuffer, tea_key);
                 }
@@ -258,26 +256,22 @@ public class XLogFileDecode {
                 return;
             }
 
-            StringBuffer outbuffer = new StringBuffer();
-
-            RetData retData = new RetData(startpos, 0);
-            while (true) {
-                LogUtil.i(TAG, retData.startPos + ":" + retData.lastSeq);
-                retData = DecodeBuffer(_buffer, retData.startPos, retData.lastSeq, outbuffer, privateKey);
-                if (-1 == retData.startPos) {
-                    break;
-                }
-            }
-
-            if (0 == outbuffer.length()) {
-                return;
-            }
-
             os = new FileOutputStream(_outfile);
             writer = new OutputStreamWriter(os);
             bw = new BufferedWriter(writer);
-            bw.write(outbuffer.toString());
-            bw.flush();
+
+            RetData retData = new RetData(startpos, 0);
+            while (true) {
+                StringBuilder outBuffer = new StringBuilder();
+                retData = DecodeBuffer(_buffer, retData.startPos, retData.lastSeq, outBuffer, privateKey);
+                if (-1 == retData.startPos) {
+                    break;
+                }
+                if (!outBuffer.isEmpty()) {
+                    bw.write(outBuffer.toString());
+                    bw.flush();
+                }
+            }
         } catch (IOException e) {
             LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
             throw new IOException(e);

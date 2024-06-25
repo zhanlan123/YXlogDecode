@@ -38,6 +38,9 @@
     <string name="import_private_key_success">导入密钥成功</string>
     <string name="select_default_private_key_title">默认密钥设置</string>
     <string name="select_default_private_key_hint">导入日志解密时，是否使用默认选中的密钥？</string>
+    <string name="split_file_key_title">分割文件</string>
+    <string name="split_file_start_size_private_key_hint">文件大于多少M需要分割（1–100M）？</string>
+    <string name="split_file_default_size_private_key_hint">分割文件的每个文件大小（1–100M）？</string>
     <string name="analysis_file_fail">解析文件失败！</string>
     <string name="msg_picked_isnt_dir">选择的路径不是文件夹!</string>
     <string name="err_invalid_data_by_intent">Intent 返回了无效数据</string>

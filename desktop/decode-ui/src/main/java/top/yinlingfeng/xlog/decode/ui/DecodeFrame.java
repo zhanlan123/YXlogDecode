@@ -5,6 +5,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.extras.FlatSVGUtils;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.FileHeader;
 import net.miginfocom.swing.MigLayout;
 
 import org.apache.commons.io.FileUtils;
@@ -91,6 +92,8 @@ public class DecodeFrame extends JFrame {
     private JButton btnStartDecodeButton;
     //解密详细信息展示
     private JTextPane decodeInfotextPane;
+    //解密详细信息滚动面板
+    private JScrollPane hintScrollPane;
     //解密信息
     private Document decodeInfoDocs;
     //信息显示的字体设置
@@ -361,8 +364,16 @@ public class DecodeFrame extends JFrame {
     private void decodeInfoText(String text, FontAttribute fontAttribute) {
         try {
             decodeInfoDocs.insertString(decodeInfoDocs.getLength(), text + "\n\n", fontAttribute.getAttrSet());
+            scrollToBottom();
         } catch (BadLocationException e) {
             LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
+        }
+    }
+
+    private void scrollToBottom() {
+        JScrollBar jScrollBar = hintScrollPane.getVerticalScrollBar();
+        if (jScrollBar != null) {
+            jScrollBar.setValue(jScrollBar.getMaximum());
         }
     }
 
@@ -969,8 +980,8 @@ public class DecodeFrame extends JFrame {
         decodeInfotextPane.setFont(commonFont);
         decodeInfotextPane.setEditable(true);
         //滚动面板
-        JScrollPane scrollPane = new JScrollPane(decodeInfotextPane);
-        contentPane.add(scrollPane, "width 230:230:, height 150:150:, wrap");
+        hintScrollPane = new JScrollPane(decodeInfotextPane);
+        contentPane.add(hintScrollPane, "width 230:230:, height 150:150:, wrap");
         //为信息设置不同颜色
         hintFontAttribute = new FontAttribute(1);
         errorFontAttribute = new FontAttribute(2);
@@ -1126,6 +1137,7 @@ public class DecodeFrame extends JFrame {
 
         private final String saveFilePath;
 
+        private final List<File> allChildZipFilesPath = new ArrayList<>();
         private final List<String> allLogFilesPath = new ArrayList<>();
 
         public UnzipTask(String zipFilePath, String saveFilePath) {
@@ -1136,43 +1148,80 @@ public class DecodeFrame extends JFrame {
         @Override
         protected List<String> doInBackground() {
             allLogFilesPath.clear();
+            allChildZipFilesPath.clear();
             if (zipFilePath.endsWith(".zip")) {
                 LogUtil.ei("开始解压文件：" + zipFilePath);
-                String destinationPath = saveFilePath + File.separator + unzipFolderName;
-                LogUtil.ei("解压后文件保存目录：" + destinationPath);
-                // 防止因为解压出错，但是实际解压成功，导致不能解密。
-                try {
-                    ZipFile zipFile = new ZipFile(zipFilePath);
-                    zipFile.extractAll(destinationPath);
-                } catch (ZipException e) {
-                    LogUtil.ei("ZIP文件存在异常！");
-                    LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
-                }
-                File saveFileDir = new File(destinationPath);
+                File saveFileDir = getUnZipSaveFileDir(new File(zipFilePath), unzipFolderName);
                 if (saveFileDir.isDirectory()) {
-                    getAllFilePath(saveFileDir);
-                    return allLogFilesPath;
+                    getAllFilePath(saveFileDir, true);
                 }
+                unChildZipFiles();
+                return allLogFilesPath;
             } else {
                 LogUtil.ei("直接增加需要解密的日志文件：" + zipFilePath);
                 allLogFilesPath.add(zipFilePath);
                 return allLogFilesPath;
             }
-            return null;
+        }
+
+        /**
+         * 获取解压后的文件目录
+         * @param needUnZipFile
+         * @param dirName
+         * @return
+         */
+        private File getUnZipSaveFileDir(File needUnZipFile, String dirName) {
+            String destinationPath = saveFilePath + File.separator + dirName;
+            LogUtil.ei("解压后文件保存目录：" + destinationPath);
+            // 防止因为解压出错，但是实际解压成功，导致不能解密。
+            try {
+                ZipFile zipFile = Utils.getZipFile(needUnZipFile);
+                zipFile.extractAll(destinationPath);
+            } catch (ZipException e) {
+                LogUtil.ei("ZIP文件存在异常！");
+                LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
+            }
+            return new File(destinationPath);
         }
 
 
+        /**
+         * 解压子目录中的zip文件
+         */
+        private void unChildZipFiles() {
+            if (!allChildZipFilesPath.isEmpty()) {
+                for (File childZipFile: allChildZipFilesPath) {
+                    File saveFileDir = getUnZipSaveFileDir(childZipFile, unzipFolderName +
+                            File.separator + childZipFile.getName().substring(0, childZipFile.getName().lastIndexOf(".")));
+                    if (saveFileDir.isDirectory()) {
+                        getAllFilePath(saveFileDir, false);
+                    }
+                }
+            }
+        }
 
-        private void getAllFilePath(File saveFileDir) {
+
+        /**
+         * 获取给定的目录的所有日志文件
+         * @param saveFileDir
+         * @param isAddZipFile
+         */
+        private void getAllFilePath(File saveFileDir, boolean isAddZipFile) {
             File[] fileArray = saveFileDir.listFiles();
             if (fileArray != null) {
                 for (File file : fileArray) {
                     if (file.isDirectory()) {
-                        getAllFilePath(file);
+                        getAllFilePath(file, isAddZipFile);
                     } else {
                         if (file.getAbsolutePath().endsWith("xlog")) {
                             LogUtil.ei("增加需要解密的日志文件：" + file.getName());
                             allLogFilesPath.add(file.getAbsolutePath());
+                        }
+                        if (isAddZipFile) {
+                            if (file.getAbsolutePath().endsWith("zip")) {
+                                LogUtil.ei("增加需要解压的zip压缩文件：" + file.getName());
+                                allChildZipFilesPath.add(file);
+                            }
                         }
                     }
                 }

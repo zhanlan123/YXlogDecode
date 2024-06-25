@@ -28,6 +28,16 @@ public class MMKVName {
     public static final String SELECT_DEFAULT_PRIVATE_KEY = "select_default_private_key";
 
     /**
+     * 分割文件大小
+     */
+    public static final String SPLIT_FILE_SIZE_KEY = "split_file_size_key";
+
+    /**
+     * 起始分割文件大小
+     */
+    public static final String SPLIT_FILE_START_SIZE_KEY = "split_file_start_size_key";
+
+    /**
      * 所有历史记录，
      */
     public static final String ALL_HISTORY_RECORD = "all_history_record";

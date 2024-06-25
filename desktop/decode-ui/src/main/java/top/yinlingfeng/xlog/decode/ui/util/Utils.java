@@ -9,11 +9,23 @@
  */
 package top.yinlingfeng.xlog.decode.ui.util;
 
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.FileHeader;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+import top.yinlingfeng.xlog.decode.core.log.LogUtil;
 
 /** 
  * @ClassName: Utils 
@@ -53,4 +65,33 @@ public class Utils {
         Transferable tText = new StringSelection(writeMe);  
         clip.setContents(tText, null);  
     }
+
+	public static ZipFile getZipFile(File unZipFile) throws ZipException {
+		ZipFile zipFile = new ZipFile(unZipFile);
+		zipFile.setCharset(StandardCharsets.UTF_8);
+		List<FileHeader> headers = zipFile.getFileHeaders();
+		if (Utils.isRandomCode(headers)) {
+			try {
+				zipFile.close();
+			} catch (IOException e) {
+				LogUtil.ei("ZIP文件存在异常！");
+				LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
+			}
+			zipFile = new ZipFile(unZipFile);
+			zipFile.setCharset(Charset.forName("GBK"));
+		}
+		return zipFile;
+	}
+
+	public static boolean isRandomCode(List<FileHeader> fileHeaders) {
+		for (int i = 0; i < fileHeaders.size(); i++) {
+			FileHeader fileHeader = fileHeaders.get(i);
+			boolean canEnCode = Charset.forName("GBK").newEncoder().canEncode(fileHeader.getFileName());
+			//canEnCode为true，表示不是乱码。false.表示乱码。是乱码则需要重新设置编码格式
+			if (!canEnCode) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

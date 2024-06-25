@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <SwitchPreferenceCompat
         app:icon="@drawable/select_private_key"
         app:key="select_private_key"
@@ -7,4 +8,18 @@
         app:summary="@string/select_default_private_key_hint"
         app:defaultValue="true"
         />
+    <EditTextPreference
+        android:icon="@drawable/split_file"
+        android:key="split_file_start_size_key"
+        android:title="@string/split_file_key_title"
+        android:summary="@string/split_file_start_size_private_key_hint"
+        android:inputType="number"
+        android:defaultValue="50"/>
+    <EditTextPreference
+        android:icon="@drawable/split_file"
+        android:key="split_file_key"
+        android:title="@string/split_file_key_title"
+        android:summary="@string/split_file_default_size_private_key_hint"
+        android:inputType="number"
+        android:defaultValue="30"/>
 </PreferenceScreen>

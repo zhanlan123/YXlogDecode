@@ -1,18 +1,20 @@
 allprojects {
     repositories {
         mavenLocal()
-        google()
-        mavenCentral()
         maven {
             credentials {
                 username = "6247fd667e8dbc28d8a2212c"
                 password = "(4e])luJ1RG8"
             }
-            url = java.net.URI("https://packages.aliyun.com/maven/repository/2117453-release-bMZITa/")
+            url = uri("https://packages.aliyun.com/maven/repository/2117453-release-bMZITa/")
         }
-        maven { url = java.net.URI("https://maven.aliyun.com/repository/google") }
-        maven { url = java.net.URI("https://maven.aliyun.com/repository/public") }
-        maven { url = java.net.URI("https://jitpack.io") }
+        maven { url = uri("https://maven.aliyun.com/repository/central") }
+        mavenCentral()
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        google()
+        maven { url = uri("https://jitpack.io/") }
+        maven { url = uri("https://mirrors.cloud.tencent.com/nexus/repository/maven-public/") }
+        maven { url = uri("https://repo.huaweicloud.com/repository/maven/") }
     }
 }
 

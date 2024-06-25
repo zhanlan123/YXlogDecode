@@ -40,7 +40,7 @@ public class SettingActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        toolbarBinding.tvTitle.setText(R.string.add_private_key);
+        toolbarBinding.tvTitle.setText(R.string.setting);
         toolbarBinding.commonToolbar.setNavigationIcon(R.drawable.back);
         toolbarBinding.commonToolbar.setNavigationOnClickListener(v -> {
             onBackPressed();

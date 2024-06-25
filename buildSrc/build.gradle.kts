@@ -20,5 +20,6 @@ plugins {
 
 // required for kotlin-dsl or embedded-kotlin plugins
 repositories {
+	maven { url = uri("https://maven.aliyun.com/repository/central") }
 	mavenCentral()
 }

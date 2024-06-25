@@ -1,11 +1,15 @@
 pluginManagement {
     repositories {
-        google()
+        mavenLocal()
+        maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
         gradlePluginPortal()
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        google()
+        maven { url = uri("https://maven.aliyun.com/repository/central") }
         mavenCentral()
-        maven { url = java.net.URI("https://maven.aliyun.com/repository/google") }
-        maven { url = java.net.URI("https://maven.aliyun.com/repository/public") }
-        maven { url = java.net.URI("https://jitpack.io") }
+        maven { url = uri("https://jitpack.io/") }
+        maven { url = uri("https://mirrors.cloud.tencent.com/nexus/repository/maven-public/") }
+        maven { url = uri("https://repo.huaweicloud.com/repository/maven/") }
     }
 
     plugins {

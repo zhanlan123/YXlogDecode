@@ -146,15 +146,28 @@ public class CommonUtils {
     }
 
     public static byte[] decompress(byte[] encdata) {
+        ByteArrayOutputStream bos = null;
+        InflaterOutputStream zos = null;
         try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            InflaterOutputStream zos = new InflaterOutputStream(bos, new Inflater(true));
+            bos = new ByteArrayOutputStream();
+            zos = new InflaterOutputStream(bos, new Inflater(true));
             zos.write(encdata);
-            zos.close();
+            zos.flush();
             return bos.toByteArray();
         } catch (Exception ex) {
             LogUtil.ei(TAG, "解压缩出错可能丢失日志");
             LogUtil.ei(TAG, "错误信息:" + ExceptionUtils.getStackTrace(ex));
+        } finally {
+            try {
+                if (bos != null) {
+                    bos.close();
+                }
+                if (zos != null) {
+                    zos.close();
+                }
+            } catch (IOException e) {
+                LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
+            }
         }
         return "解压缩出错可能丢失日志\n".getBytes(StandardCharsets.UTF_8);
     }
@@ -173,13 +186,20 @@ public class CommonUtils {
             int bytesRead = zin.read(buffer, 0, 1000000);
             // 将解压缩后的数据写入ByteArrayOutputStream对象
             bout.write(buffer, 0, bytesRead);
-            // 关闭输入、输出流
-            zin.close();
-            bin.close();
-            bout.close();
+            bout.flush();
         } catch (IOException e) {
             LogUtil.ei(TAG, "解压缩出错可能丢失日志");
             LogUtil.ei(TAG, "错误信息:" + ExceptionUtils.getStackTrace(e));
+        } finally {
+            try {
+                if (zin != null) {
+                    zin.close();
+                }
+                bin.close();
+                bout.close();
+            } catch (IOException e) {
+                LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));
+            }
         }
         return bout.toByteArray();
     }

@@ -25,5 +25,9 @@ object MMKVConstants {
 
     var selectDefaultPrivateKey by PerpetualMMKVOperatingDelegate(MMKVName.SELECT_DEFAULT_PRIVATE_KEY, true)
 
+    var splitFileSizeKey by PerpetualMMKVOperatingDelegate(MMKVName.SPLIT_FILE_SIZE_KEY, 30L)
+
+    var splitFileStartSizeKey by PerpetualMMKVOperatingDelegate(MMKVName.SPLIT_FILE_START_SIZE_KEY, 50L)
+
     var allHistoryRecord by PerpetualMMKVOperatingDelegate(MMKVName.ALL_HISTORY_RECORD, ArrayList<HistoryRecord>())
 }
