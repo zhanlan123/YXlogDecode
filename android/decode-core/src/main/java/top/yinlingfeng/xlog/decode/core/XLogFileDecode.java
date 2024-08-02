@@ -5,6 +5,7 @@ import top.yinlingfeng.xlog.decode.core.log.LogUtil;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 
 class RetData{
     int startPos;
@@ -215,7 +216,7 @@ public class XLogFileDecode {
         }
 
         if (tmpbuffer != null) {
-            _outbuffer.append(new String(tmpbuffer));
+            _outbuffer.append(new String(tmpbuffer, StandardCharsets.UTF_8));
         }
 
         retData.startPos = _offset + headerLen + length + 1;

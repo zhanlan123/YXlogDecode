@@ -9,7 +9,7 @@ plugins {
 }
 
 ext {
-	YXLogDecodeVersion = "1.9.1"
+	YXLogDecodeVersion = "1.9.2"
 }
 
 buildConfig {
@@ -19,8 +19,8 @@ buildConfig {
 dependencies {
 	implementation(project(':desktop:decode-core'))
 
-	implementation 'com.formdev:flatlaf:2.4'
-	implementation 'com.formdev:flatlaf-extras:2.4'
+	implementation 'com.formdev:flatlaf:3.5'
+	implementation 'com.formdev:flatlaf-extras:3.5'
 	implementation 'com.miglayout:miglayout-swing:5.3'
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
