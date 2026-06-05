@@ -32,6 +32,7 @@ import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
 import java.awt.event.*;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -268,14 +269,16 @@ public class DecodeFrame extends JFrame {
             selectPrivateKeyCheckBox.setSelected(true);
             btnSavePrivateKeyInfoButton.setText("修改");
             inputPrivateKeyTextArea.setEditable(false);
+            btnSavePrivateKeyInfoButton.setEnabled(true);
             if (operationSave.getSelectPrivateKeySelectIndex() >= selectPrivateKeyInfoComboBox.getItemCount()) {
                 operationSave.setSelectPrivateKeySelectIndex(0);
             }
             selectPrivateKeyInfoComboBox.setSelectedIndex(operationSave.getSelectPrivateKeySelectIndex());
-        } else {
+        } else if (operationSave.getPrivateKeySelectMode() == 2) {
             inputPrivateKeyCheckBox.setSelected(true);
             btnSavePrivateKeyInfoButton.setText("保存");
             inputPrivateKeyTextArea.setEditable(true);
+            btnSavePrivateKeyInfoButton.setEnabled(true);
             if (!operationSave.getInputPrivateKeyInfo().isEmpty()) {
                 inputPrivateKeyTextArea.setText(operationSave.getInputPrivateKeyInfo());
                 inputPublicKeyTextArea.setText("");
@@ -287,6 +290,13 @@ public class DecodeFrame extends JFrame {
                     inputPublicKeyTextArea.setText("推算公钥出错");
                 }
             }
+        } else {
+            inputPrivateKeyCheckBox.setSelected(false);
+            inputPrivateKeyTextArea.setEditable(false);
+            selectPrivateKeyCheckBox.setSelected(false);
+            selectPrivateKeyInfoComboBox.setEnabled(false);
+            btnDeletePrivateKeyInfoButton.setEnabled(false);
+            btnSavePrivateKeyInfoButton.setEnabled(false);
         }
 
     }
@@ -362,11 +372,15 @@ public class DecodeFrame extends JFrame {
     };
 
     private void decodeInfoText(String text, FontAttribute fontAttribute) {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(() -> decodeInfoText(text, fontAttribute));
+            return;
+        }
         try {
             decodeInfoDocs.insertString(decodeInfoDocs.getLength(), text + "\n\n", fontAttribute.getAttrSet());
             scrollToBottom();
         } catch (BadLocationException e) {
-            LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
+            LOGGER.warning("异常信息：" + ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -413,33 +427,42 @@ public class DecodeFrame extends JFrame {
         logPathTextField.setFont(commonFont);
         //设置鼠标拖入
         logPathTextField.setTransferHandler(new TransferHandler() {
-
+            @Override
             public boolean importData(TransferHandler.TransferSupport support) {
                 if (!canImport(support)) {
                     return false;
                 }
                 try {
                     Object filePathObject = support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                    String filePath = filePathObject.toString();
-                    if (filePath.startsWith("[")) {
-                        filePath = filePath.substring(1);
+                    if (filePathObject instanceof List) {
+                        @SuppressWarnings("unchecked")
+                        List<File> fileList = (List<File>) filePathObject;
+                        if (!fileList.isEmpty()) {
+                            String filePath = fileList.get(0).getAbsolutePath();
+                            LogUtil.i("filePath:" + filePath);
+                            SwingUtilities.invokeLater(() -> {
+                                logPathTextField.setText("");
+                                logPathTextField.setText(filePath);
+                                logDecodeSavePathTextField.setText("");
+                            });
+                            return true;
+                        }
                     }
-                    if (filePath.endsWith("]")) {
-                        filePath = filePath.substring(0, filePath.length() - 1);
-                    }
-                    LogUtil.i("filePath:" + filePath);
-                    logPathTextField.setText("");
-                    logPathTextField.setText(filePath);
-                    logDecodeSavePathTextField.setText("");
-                    return true;
                 } catch (UnsupportedFlavorException | IOException e) {
                     LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
                 }
                 return false;
             }
 
+            @Override
             public boolean canImport(TransferHandler.TransferSupport support) {
-                return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
+                if (!support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                    return false;
+                }
+                if (support.isDrop()) {
+                    support.setDropAction(DnDConstants.ACTION_COPY);
+                }
+                return true;
             }
         });
         contentPane.add(logPathTextField, "width 230:230:");
@@ -706,6 +729,7 @@ public class DecodeFrame extends JFrame {
         inputPrivateKeyTextArea.setEditable(false);
         selectPrivateKeyInfoComboBox.setEnabled(true);
         btnDeletePrivateKeyInfoButton.setEnabled(true);
+        btnSavePrivateKeyInfoButton.setEnabled(true);
     }
 
     private void inputPrivateKeyOperation() {
@@ -715,11 +739,18 @@ public class DecodeFrame extends JFrame {
         selectPrivateKeyInfoComboBox.setEnabled(false);
         btnDeletePrivateKeyInfoButton.setEnabled(false);
         inputPrivateKeyTextArea.setEditable(true);
+        btnSavePrivateKeyInfoButton.setEnabled(true);
     }
 
     private void noSelectJude() {
         if (!inputPrivateKeyCheckBox.isSelected() && !selectPrivateKeyCheckBox.isSelected()) {
             privateKeyMode = 0;
+            inputPrivateKeyCheckBox.setSelected(false);
+            inputPrivateKeyTextArea.setEditable(false);
+            selectPrivateKeyCheckBox.setSelected(false);
+            selectPrivateKeyInfoComboBox.setEnabled(false);
+            btnDeletePrivateKeyInfoButton.setEnabled(false);
+            btnSavePrivateKeyInfoButton.setEnabled(false);
         }
     }
 

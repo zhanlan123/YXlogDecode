@@ -9,7 +9,7 @@ plugins {
 }
 
 ext {
-	YXLogDecodeVersion = "1.9.2"
+	YXLogDecodeVersion = "1.9.3"
 }
 
 buildConfig {
@@ -55,14 +55,14 @@ jar {
 	manifest {
 		if( JavaVersion.current() >= JavaVersion.VERSION_1_9 ) {
 			attributes(
-					"Main-Class": application.mainClass.get(),
-					"Class-Path": configurations.runtimeClasspath.collect { it.getName() }.join(' '),
+					"Main-Class": application.mainClass,
+					"Class-Path": project.provider { configurations.runtimeClasspath.collect { it.name }.join(' ') },
 					"Multi-Release": true
 			)
 		} else {
 			attributes(
-					"Main-Class": application.mainClass.get(),
-					"Class-Path": configurations.runtimeClasspath.collect { it.getName() }.join(' ')
+					"Main-Class": application.mainClass,
+					"Class-Path": project.provider { configurations.runtimeClasspath.collect { it.name }.join(' ') }
 			)
 		}
 	}

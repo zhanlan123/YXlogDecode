@@ -6,14 +6,14 @@ plugins {
 
 android {
     namespace 'top.yinlingfeng.xlog.decode'
-    compileSdk 33
+    compileSdk 35
 
     defaultConfig {
         applicationId "top.yinlingfeng.xlog.decode"
         minSdk 24
-        targetSdk 33
-        versionCode 10
-        versionName "1.9.2"
+        targetSdk 35
+        versionCode 11
+        versionName "1.9.3"
         ndk {
             abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a'
         }
@@ -38,34 +38,37 @@ android {
         }
     }
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
 }
 
 dependencies {
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"
     implementation project(":android:decode-core")
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.activity:activity:1.8.1'
     def lifecycle_version = "2.6.1"
     // ViewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     // LiveData
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
-    implementation 'com.guolindev.permissionx:permissionx:1.7.1'
+    implementation 'com.guolindev.permissionx:permissionx:1.8.1'
     implementation 'com.afollestad.material-dialogs:core:3.3.0'
     implementation 'com.afollestad.material-dialogs:lifecycle:3.3.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
     implementation "androidx.documentfile:documentfile:1.0.1"
     implementation 'com.blankj:utilcodex:1.31.1'
-    implementation "com.hgsoft.app:mmkv:1.2301.3"
+    implementation "com.hgsoft.app:mmkv:1.2601.1"
     implementation 'org.ini4j:ini4j:0.5.4'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation(platform("io.github.Rosemoe.sora-editor:bom:0.22.0"))
     implementation("io.github.Rosemoe.sora-editor:editor")
-    implementation 'com.hgsoft.app:loglibrary:1.2301.1'
+    implementation 'com.hgsoft.app:loglibrary:1.2401.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

@@ -1,10 +1,12 @@
 package top.yinlingfeng.xlog.decode;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 
 import android.Manifest;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import com.blankj.utilcode.util.ToastUtils;
 import com.hgsoft.log.LogUtil;
@@ -35,8 +37,12 @@ public class LogoActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_logo);
-        WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView()).setAppearanceLightStatusBars(true);
-        startPermission();
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+            startPermission();
+        } else {
+            startActivity(new Intent(LogoActivity.this, MainActivity.class));
+            LogoActivity.this.finish();
+        }
     }
 
     private void startPermission() {

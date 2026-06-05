@@ -46,9 +46,11 @@ if( JavaVersion.current() >= JavaVersion.VERSION_1_9 ) {
 
 			dependsOn( extension.paths )
 
-			options.compilerArgs.add( "--module-path" )
-			options.compilerArgs.add( configurations.runtimeClasspath.get().asPath
-				+ File.pathSeparator + configurations.compileClasspath.get().asPath )
+			options.compilerArgumentProviders.add(CommandLineArgumentProvider {
+				val runtimeCP = configurations.getByName("runtimeClasspath")
+				val compileCP = configurations.getByName("compileClasspath")
+				listOf("--module-path", (runtimeCP + compileCP).asPath)
+			})
 		}
 
 		jar {

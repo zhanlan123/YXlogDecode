@@ -6,7 +6,7 @@ public class OperationSave {
 
     private String saveLogPath = "";
 
-    private int privateKeySelectMode = 1;
+    private int privateKeySelectMode = 0;
 
     private int selectPrivateKeySelectIndex = 0;
     private String inputPrivateKeyInfo = "";
