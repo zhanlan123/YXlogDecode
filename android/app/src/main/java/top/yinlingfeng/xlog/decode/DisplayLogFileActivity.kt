@@ -11,15 +11,20 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar.OnMenuItemClickListener
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.OnApplyWindowInsetsListener
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.blankj.utilcode.util.ToastUtils
+import com.google.android.material.shape.MaterialShapeDrawable
 import com.hgsoft.log.LogUtil
 import io.github.rosemoe.sora.event.ContentChangeEvent
 import io.github.rosemoe.sora.event.EditorKeyEvent
@@ -40,8 +45,6 @@ import io.github.rosemoe.sora.widget.subscribeEvent
 import kotlinx.coroutines.launch
 import top.yinlingfeng.xlog.decode.databinding.ActivityDisplayLogFileBinding
 import top.yinlingfeng.xlog.decode.databinding.CommonToolbarBinding
-import top.yinlingfeng.xlog.decode.filetree.FileTreeFragment
-import top.yinlingfeng.xlog.decode.utils.EventObserver
 import top.yinlingfeng.xlog.decode.viewmodel.DisplayLogFileViewModel
 import java.io.FileInputStream
 import java.io.IOException
@@ -69,9 +72,22 @@ class DisplayLogFileActivity: AppCompatActivity() {
     private lateinit var toolbarBinding: CommonToolbarBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         binding = ActivityDisplayLogFileBinding.inflate(layoutInflater)
         toolbarBinding = CommonToolbarBinding.bind(binding.root)
         setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(
+            binding.clMain
+        ) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                systemBars.bottom
+            )
+            insets
+        }
         LogUtil.i(TAG, "viewModel：${viewModel}")
         initView()
         initEventObserver()
@@ -86,8 +102,9 @@ class DisplayLogFileActivity: AppCompatActivity() {
     private fun initView() {
         initSearchView()
         initCodeEditor()
-        if (!binding.root.isDrawerOpen(GravityCompat.END)) {
-            binding.root.openDrawer(GravityCompat.END)
+        binding.dlMain.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        if (!binding.dlMain.isDrawerOpen(GravityCompat.END)) {
+            binding.dlMain.openDrawer(GravityCompat.END)
         }
         setListener()
     }
@@ -351,8 +368,10 @@ class DisplayLogFileActivity: AppCompatActivity() {
             val editor = binding.codeEditor
             when (id) {
                 R.id.open_file_tree -> {
-                    if (!binding.root.isDrawerOpen(GravityCompat.END)) {
-                        binding.root.openDrawer(GravityCompat.END)
+                    if (!binding.dlMain.isDrawerOpen(GravityCompat.END)) {
+                        binding.dlMain.openDrawer(GravityCompat.END)
+                    } else {
+                        binding.dlMain.closeDrawer(GravityCompat.END)
                     }
                 }
                 R.id.text_undo -> {
