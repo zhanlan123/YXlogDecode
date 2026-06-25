@@ -33,6 +33,9 @@ import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -425,46 +428,7 @@ public class DecodeFrame extends JFrame {
         //log路径输入框
         logPathTextField = new JTextField();
         logPathTextField.setFont(commonFont);
-        //设置鼠标拖入
-        logPathTextField.setTransferHandler(new TransferHandler() {
-            @Override
-            public boolean importData(TransferHandler.TransferSupport support) {
-                if (!canImport(support)) {
-                    return false;
-                }
-                try {
-                    Object filePathObject = support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                    if (filePathObject instanceof List) {
-                        @SuppressWarnings("unchecked")
-                        List<File> fileList = (List<File>) filePathObject;
-                        if (!fileList.isEmpty()) {
-                            String filePath = fileList.get(0).getAbsolutePath();
-                            LogUtil.i("filePath:" + filePath);
-                            SwingUtilities.invokeLater(() -> {
-                                logPathTextField.setText("");
-                                logPathTextField.setText(filePath);
-                                logDecodeSavePathTextField.setText("");
-                            });
-                            return true;
-                        }
-                    }
-                } catch (UnsupportedFlavorException | IOException e) {
-                    LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
-                }
-                return false;
-            }
-
-            @Override
-            public boolean canImport(TransferHandler.TransferSupport support) {
-                if (!support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                    return false;
-                }
-                if (support.isDrop()) {
-                    support.setDropAction(DnDConstants.ACTION_COPY);
-                }
-                return true;
-            }
-        });
+        setLogPathDropTarget(logPathTextField);
         contentPane.add(logPathTextField, "width 230:230:");
 
         //选择log路径按钮
@@ -484,8 +448,7 @@ public class DecodeFrame extends JFrame {
             if (showResult == JFileChooser.APPROVE_OPTION) {
                 String logPath = logFileChooser.getSelectedFile().getAbsolutePath();
                 if (logPath.endsWith("xlog") || logPath.endsWith("zip")) {
-                    logPathTextField.setText(logPath);
-                    logDecodeSavePathTextField.setText("");
+                    updateLogPath(logPath);
                 } else {
                     LogUtil.i("不支持解密这个文件");
                 }
@@ -520,6 +483,48 @@ public class DecodeFrame extends JFrame {
         });
         contentPane.add(btnSelectLogDecodeSavePathButton, "wrap, width 100:100:100");
 
+    }
+
+    /**
+     * 设置日志路径输入框的文件拖放。只在 drop 时读取文件列表，避免拖拽悬停时阻塞 UI。
+     */
+    private void setLogPathDropTarget(Component component) {
+        new DropTarget(component, DnDConstants.ACTION_COPY, new DropTargetAdapter() {
+            @Override
+            public void drop(DropTargetDropEvent event) {
+                if (!event.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                    event.rejectDrop();
+                    return;
+                }
+                event.acceptDrop(DnDConstants.ACTION_COPY);
+                boolean dropSuccess = false;
+                try {
+                    Object filePathObject = event.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    if (filePathObject instanceof List) {
+                        List<?> fileList = (List<?>) filePathObject;
+                        if (!fileList.isEmpty() && fileList.get(0) instanceof File) {
+                            String filePath = ((File) fileList.get(0)).getAbsolutePath();
+                            LogUtil.i("filePath:" + filePath);
+                            updateLogPath(filePath);
+                            dropSuccess = true;
+                        }
+                    }
+                } catch (UnsupportedFlavorException | IOException e) {
+                    LogUtil.ei("异常信息：" + ExceptionUtils.getStackTrace(e));
+                } finally {
+                    event.dropComplete(dropSuccess);
+                }
+            }
+        }, true);
+    }
+
+    private void updateLogPath(String filePath) {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(() -> updateLogPath(filePath));
+            return;
+        }
+        logPathTextField.setText(filePath);
+        logDecodeSavePathTextField.setText("");
     }
 
     /**
