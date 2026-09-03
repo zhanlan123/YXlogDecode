@@ -56,24 +56,24 @@ public class XLogFileDecode {
                 MAGIC_ASYNC_NO_CRYPT_ZSTD_START == magic_start){
             crypt_key_len = 64;
         } else {
-            LogUtil.i(TAG, String.format("_buffer[%d]:%d != MAGIC_NUM_START", _offset, _buffer[_offset]));
+            LogUtil.e(TAG, String.format("_buffer[%d]:%d != MAGIC_NUM_START", _offset, _buffer[_offset]));
             return false;
         }
 
         int headerLen = 1 + 2 + 1 + 1 + 4 + crypt_key_len;
 
         if (_offset + headerLen + 1 + 1 > _buffer.length) {
-            LogUtil.i(TAG, String.format("offset:%d > len(buffer):%d", _offset, _buffer.length));
+            LogUtil.e(TAG, String.format("offset:%d > len(buffer):%d", _offset, _buffer.length));
             return false;
         }
         int length = ByteBuffer.wrap(_buffer, _offset + headerLen - 4 - crypt_key_len, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
         long llength = length&0xffffffffL;
         if (_offset + headerLen + llength + 1 > _buffer.length){
-            LogUtil.i(TAG, String.format("log length:%d, end pos %d > len(buffer):%d",llength, _offset + headerLen + llength + 1, _buffer.length));
+            LogUtil.e(TAG, String.format("log length:%d, end pos %d > len(buffer):%d",llength, _offset + headerLen + llength + 1, _buffer.length));
             return false;
         }
         if(MAGIC_END != _buffer[_offset + headerLen + length]){
-            LogUtil.i(TAG, String.format("log length:%d, buffer[%d]:%d != MAGIC_END", length, _offset + headerLen + length, _buffer[_offset + headerLen + length]));
+            LogUtil.e(TAG, String.format("log length:%d, buffer[%d]:%d != MAGIC_END", length, _offset + headerLen + length, _buffer[_offset + headerLen + length]));
             return false;
         }
 
@@ -127,7 +127,7 @@ public class XLogFileDecode {
             if (-1 == fixpos) {
                 return new RetData(-1, lastseq);
             } else {
-                LogUtil.i(TAG, String.format("[F]decode_log_file.py decode error len=%d, result:%s \n", fixpos, ret));
+                LogUtil.e(TAG, String.format("[F]decode_log_file.py decode error len=%d, result:%s \n", fixpos, ret));
                 _outbuffer.append(String.format("[F]decode_log_file.py decode error len=%d, result:%s \n", fixpos, ret));
                 _offset += fixpos;
             }
@@ -149,7 +149,7 @@ public class XLogFileDecode {
 
             crypt_key_len = 64;
         } else {
-            LogUtil.i(TAG, String.format("n DecodeBuffer _buffer[%d]:%d != MAGIC_NUM_START", _offset, magic_start));
+            LogUtil.e(TAG, String.format("n DecodeBuffer _buffer[%d]:%d != MAGIC_NUM_START", _offset, magic_start));
             _outbuffer.append("in DecodeBuffer _buffer[%d]:%d != MAGIC_NUM_START", _offset, magic_start);
             return new RetData(-1, lastseq);
         }
@@ -164,8 +164,7 @@ public class XLogFileDecode {
         char end_hour = (char)ByteBuffer.wrap(_buffer, _offset+headerLen-4-crypt_key_len-1, 1).order(ByteOrder.LITTLE_ENDIAN).get();
 
         if (seq != 0 && seq != 1 && lastseq != 0 && seq != (lastseq+1)){
-            LogUtil.i(TAG, String.format("[F]decode_log_file.py log seq:%d-%d is missing\n", lastseq+1, seq-1));
-            _outbuffer.append(String.format("[F]decode_log_file.py log seq:%d-%d is missing\n", lastseq+1, seq-1));
+            LogUtil.ei(TAG, String.format("[F]decode_log_file.py log seq:%d-%d is missing\n", lastseq+1, seq-1));
         }
 
         if (seq != 0){

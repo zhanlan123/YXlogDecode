@@ -56,24 +56,24 @@ public class XLogFileDecode {
                 MAGIC_ASYNC_NO_CRYPT_ZSTD_START == magic_start){
             crypt_key_len = 64;
         } else {
-            LogUtil.i(TAG, String.format("_buffer[%d]:%d != MAGIC_NUM_START", _offset, _buffer[_offset]));
+            LogUtil.e(TAG, String.format("_buffer[%d]:%d != MAGIC_NUM_START", _offset, _buffer[_offset]));
             return false;
         }
 
         int headerLen = 1 + 2 + 1 + 1 + 4 + crypt_key_len;
 
         if (_offset + headerLen + 1 + 1 > _buffer.length) {
-            LogUtil.i(TAG, String.format("offset:%d > len(buffer):%d", _offset, _buffer.length));
+            LogUtil.e(TAG, String.format("offset:%d > len(buffer):%d", _offset, _buffer.length));
             return false;
         }
         int length = ByteBuffer.wrap(_buffer, _offset + headerLen - 4 - crypt_key_len, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
         long llength = length&0xffffffffL;
         if (_offset + headerLen + llength + 1 > _buffer.length){
-            LogUtil.i(TAG, String.format("log length:%d, end pos %d > len(buffer):%d",llength, _offset + headerLen + llength + 1, _buffer.length));
+            LogUtil.e(TAG, String.format("log length:%d, end pos %d > len(buffer):%d",llength, _offset + headerLen + llength + 1, _buffer.length));
             return false;
         }
         if(MAGIC_END != _buffer[_offset + headerLen + length]){
-            LogUtil.i(TAG, String.format("log length:%d, buffer[%d]:%d != MAGIC_END", length, _offset + headerLen + length, _buffer[_offset + headerLen + length]));
+            LogUtil.e(TAG, String.format("log length:%d, buffer[%d]:%d != MAGIC_END", length, _offset + headerLen + length, _buffer[_offset + headerLen + length]));
             return false;
         }
 
@@ -165,7 +165,6 @@ public class XLogFileDecode {
 
         if (seq != 0 && seq != 1 && lastseq != 0 && seq != (lastseq+1)){
             LogUtil.i(TAG, String.format("[F]decode_log_file.py log seq:%d-%d is missing\n", lastseq+1, seq-1));
-            _outbuffer.append(String.format("[F]decode_log_file.py log seq:%d-%d is missing\n", lastseq+1, seq-1));
         }
 
         if (seq != 0){
@@ -176,7 +175,7 @@ public class XLogFileDecode {
 
         try{
             if (MAGIC_NO_COMPRESS_START1 == _buffer[_offset] ||  MAGIC_SYNC_ZSTD_START==_buffer[_offset]){
-                LogUtil.i(TAG, "不是压缩开始位置一");
+                LogUtil.e(TAG, "不是压缩开始位置一");
             } else if (MAGIC_COMPRESS_START2 == _buffer[_offset] || MAGIC_ASYNC_ZSTD_START==_buffer[_offset]) {
                 if (privateKey != null && privateKey.length() > 0) {
                     byte[] byte_pubkey_x = new byte[32];
@@ -204,9 +203,9 @@ public class XLogFileDecode {
                 MAGIC_COMPRESS_NO_CRYPT_START == _buffer[_offset]) {
                 tmpbuffer = CommonUtils.decompress(tmpbuffer);
             } else if(MAGIC_COMPRESS_START1 == _buffer[_offset]) {
-                LogUtil.i(TAG, "压缩开始位置一");
+                LogUtil.e(TAG, "压缩开始位置一");
             } else {
-                LogUtil.i(TAG, "未知位置");
+                LogUtil.e(TAG, "未知位置");
             }
         }catch (Exception e){
             LogUtil.e("异常信息：" + ExceptionUtils.getStackTrace(e));

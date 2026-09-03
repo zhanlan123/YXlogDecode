@@ -9,7 +9,7 @@ plugins {
 }
 
 ext {
-	YXLogDecodeVersion = "1.9.3"
+	YXLogDecodeVersion = "1.9.4"
 }
 
 buildConfig {
